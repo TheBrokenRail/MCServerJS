@@ -1,0 +1,117 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
+<div class="col-lg-4 form-inline">
+  <h2>Minecraft Server Properties</h2>
+  <span>Version: </span><select class="form-control" id="version"></select><br /><br />
+  <span>Port: </span><input class="form-control" id="port"></input><br /><br />
+  <span>Seed: </span><input class="form-control" id="seed"></input><br /><br />
+  <span>Difficulty: &nbsp&nbsp&nbsp</span><input data-slider-min="0" data-slider-max="3" min="0" max="3" type="range" id="difficulty"></input><br /><br />
+  <label class="checkbox-inline"><input type="checkbox" id="pvp"><span>PvP</span></label><br /><br />
+  <label class="checkbox-inline"><input type="checkbox" id="enableCommandBlocks"><span>Command Blocks</span></label><br /><br />
+  <span>Gamemode: </span><select class="form-control" id="gamemode">
+    <option value="0">Survival</option>
+    <option value="1">Creative</option>
+    <option value="2">Adventure</option>
+    <option value="3">Spectator</option>
+  </select><br /><br />
+  <span>Max Players: </span><input class="form-control" id="maxPlayers"></input><br /><br />
+  <span>Message Of The Day: </span><input class="form-control" id="motd"></input><br /><br />
+  <span>RAM: </span><input class="form-control" id="ram"></input><span> GB</span><br /><br />
+  <label class="checkbox-inline"><input type="checkbox" id="deleteWorld"><span>Delete World On Save</span></label><br /><br />
+  <label class="checkbox-inline"><input type="checkbox" id="saveServerData"><span>Save White-list, Bans, and OPs on Server Restart</span></label><br /><br />
+  <button class="btn btn-default" id="save">Save</button> <button class="btn btn-default" id="clearLog">Clear Log</button><br />
+</div>
+<textarea id="log" disabled style="position: absolute; top: 0; left: 50%; height: calc(100% - 32px); width: 50%; resize: none; overflow: hidden;"></textarea>
+<input id="command" style="position: absolute; top: calc(100% - 32px); left: 50%; height: 32px; width: 50%; resize: none;"></input>
+<script>
+var slider = new Slider("input#difficulty", {});
+var config = JSON.parse('CONFIG_JSON');
+var versions = JSON.parse('VERSIONS_JSON');
+var select = document.getElementById('version');
+select.innerHTML = '';
+for (i = 0; i < versions.length; i++) {
+  var option = document.createElement('OPTION');
+  option.value = versions[i][1];
+  option.appendChild(document.createTextNode(versions[i][0]));
+  if (versions[i][1] === config.version) option.selected = true;
+  select.appendChild(option);
+}
+setInterval(function () {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById('log').value = xhr.responseText;
+      document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+    }
+  };
+  xhr.open('GET', '/log');
+  xhr.send();
+}, 250);
+document.getElementById('command').onkeyup = function (e) {
+  if (e.keyCode == 13) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/command');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({text: document.getElementById('command').value}));
+    document.getElementById('command').value = '';
+  }
+};
+document.getElementById('save').onclick = function () {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/setConfig');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({config: config, deleteWorld: document.getElementById('deleteWorld')}));
+};
+document.getElementById('clearLog').onclick = function () {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/clearLog');
+  xhr.send();
+};
+document.getElementById('version').onchange = function () {
+  config.version = document.getElementById('version').options[document.getElementById('version').selectedIndex].value;
+};
+document.getElementById('port').oninput = function () {
+  config.port = document.getElementById('port').value;
+};
+document.getElementById('seed').oninput = function () {
+  config.seed = document.getElementById('seed').value;
+};
+document.getElementById('pvp').onchange = function () {
+  config.pvp = document.getElementById('pvp').checked;
+};
+slider.on('change', function () {
+  config.difficulty = slider.getValue();
+});
+document.getElementById('enableCommandBlocks').onchange = function () {
+  config.enableCommandBlocks = document.getElementById('enableCommandBlocks').checked;
+};
+document.getElementById('gamemode').oninput = function () {
+  config.gamemode = parseInt(document.getElementById('gamemode').options[document.getElementById('gamemode').selectedIndex].value);
+};
+document.getElementById('maxPlayers').oninput = function () {
+  config.maxPlayers = parseInt(document.getElementById('maxPlayers').value);
+};
+document.getElementById('motd').oninput = function () {
+  config.motd = document.getElementById('motd').value;
+};
+document.getElementById('ram').oninput = function () {
+  config.ram = parseInt(document.getElementById('ram').value);
+};
+document.getElementById('saveServerData').onchange = function () {
+  config.saveServerData = document.getElementById('saveServerData').checked;
+};
+document.getElementById('port').value = config.port;
+document.getElementById('seed').value = config.seed;
+document.getElementById('pvp').checked = config.pvp;
+slider.setValue(parseInt(config.difficulty));
+document.getElementById('enableCommandBlocks').checked = config.enableCommandBlocks;
+var gamemode = document.getElementById('gamemode');
+for (i = 0; i < gamemode.options.length; i++) {
+  if (parseInt(gamemode.options[i].value) == config.gamemode) gamemode.options[i].selected = true;
+}
+document.getElementById('maxPlayers').value = config.maxPlayers;
+document.getElementById('motd').value = config.motd;
+document.getElementById('ram').value = config.ram;
+document.getElementById('saveServerData').checked = config.saveServerData;
+</script>

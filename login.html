@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<div class="container">
+  <h2>Login</h2>
+  <form action="/login" method="post">
+    <div class="alert alert-danger" id="reason" style="color: red;"></div>
+    <div class="form-group"><input placeholder="Username" type="text" class="form-control" name="username"></div>
+    <div class="form-group"><input placeholder="Password" type="password" class="form-control" name="password"></div>
+    <button type="submit" class="btn btn-default">Login</button>
+  </form>
+</div>
+<script>
+var reason = window.location.hash;
+if (reason.startsWith('#')) reason = reason.slice(1);
+document.getElementById('reason').innerHTML = decodeURIComponent(reason);
+if (reason.length < 1) document.getElementById('reason').style.display = 'none';
+</script>
