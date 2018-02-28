@@ -30,7 +30,6 @@ if (process.argv.indexOf('--headless') === -1) {
     }
   });
 }
-
 const defaultConfig = {
   version: 'latest-release',
   port: 25565,
@@ -114,20 +113,22 @@ function build() {
 var server = null;
 var log = '';
 function runCommand(str, stdin, commands) {
-    for (x in commands) {
-      var cmdArr = str.split('<');
-      if (cmdArr.length > 1) {
-        var player = cmdArr[1].split('>')[0];
-        var cmd = cmdArr[1].split('>')[1];
-        if (cmd.startsWith(' ' + x)) {
-          var args = cmd.split(' ' + x)[1].trim().split(' ');
-          try {
-            commands[x](player, args, function (cmd) {
-              stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-            });
-          } catch(e) {
-            stdin.write('tellraw ' + player + ' ' + JSON.stringify({text: e.toString(), color: 'red'}).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-          }
+  for (x in commands) {
+    var cmdArr = str.split('<');
+    if (cmdArr.length > 1) {
+      var player = cmdArr[1].split('>')[0];
+      var cmd = cmdArr[1].split('>')[1];
+      if (cmd.startsWith(' ' + x)) {
+        var args = cmd.split(' ' + x)[1].trim().split(' ');
+        try {
+          commands[x](player, args, function(cmd) {
+            stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+          });
+        } catch (e) {
+          stdin.write('tellraw ' + player + ' ' + JSON.stringify({
+            text: e.toString(),
+            color: 'red'
+          }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
         }
       }
     }
