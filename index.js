@@ -113,6 +113,26 @@ function build() {
 }
 var server = null;
 var log = '';
+function runCommand(str, stdin, commands) {
+    for (x in commands) {
+      var cmdArr = str.split('<');
+      if (cmdArr.length > 1) {
+        var player = cmdArr[1].split('>')[0];
+        var cmd = cmdArr[1].split('>')[1];
+        if (cmd.startsWith(' ' + x)) {
+          var args = cmd.split(' ' + x)[1].trim().split(' ');
+          try {
+            commands[x](player, args, function (cmd) {
+              stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+            });
+          } catch(e) {
+            stdin.write('tellraw ' + player + ' ' + JSON.stringify({text: e.toString(), color: 'red'}).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+          }
+        }
+      }
+    }
+  }
+}
 var scriptObj = require('./script');
 function run() {
   if (server) {
@@ -140,7 +160,7 @@ function run() {
       process.stdout.write(chunk.toString());
       var str = chunk.toString();
       if (str.split(']: ').length > 1) str = chunk.toString().split(']: ')[1];
-      scriptObj.listener(str, server.stdin);
+      runCommand(str, server.stdin, scriptObj.commands);
     });
     server.stderr.on('data', chunk => {
       log = log + chunk.toString();
