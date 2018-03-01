@@ -117,7 +117,17 @@ var commands = {};
 var plugins = [];
 function loadPlugins() {
   commands = {};
-  plugins = [];
+  plugins = [{
+    name: 'ServerJS Built-In',
+    version: '1.0.0',
+    description: 'Contains Built In ServerJS Command',
+    commands: {
+      serverjs: {
+        args: '<version|plugins|help>',
+        description: 'Built-In ServerJS Command'
+      }
+    }
+  }];
   if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
   var files = fs.readdirSync('plugins');
   for (i = 0; i < files.length; i++) {
@@ -169,10 +179,19 @@ function loadPlugins() {
           case 'commands':
             var text = '';
             for (x in commands) {
+              var done = false;
               for (k = 0; k < plugins.length; k++) {
                 if (plugins[k].commands.hasOwnProperty(x)) {
-                  text = text + x + ' ' + plugins[k].commands[x].args + ': ' plugins[k].commands[x].description + '\n';
+                  done = true;
+                  if (plugins[k].commands[x].args.length > 0) {
+                    text = text + x + ' ' + plugins[k].commands[x].args + ': ' plugins[k].commands[x].description + '\n';
+                  } else {
+                    text = text + x + ': ' plugins[k].commands[x].description + '\n';
+                  }
                 }
+              }
+              if (!done) {
+                text = text + x + ': No Description\n';
               }
             }
             exec('tellraw ' + player + ' ' + JSON.stringify(['', {
@@ -185,6 +204,12 @@ function loadPlugins() {
               }
             ]));
             break;
+          case 'help':
+            exec('tellraw ' + player + ' ' + JSON.stringify({
+              text: 'ServerJS: plugins <list|reload|commands|help>',
+              color: 'yellow'
+            }));
+            break;
           default:
             exec('tellraw ' + player + ' ' + JSON.stringify({
               text: 'Please Specify A Command!',
@@ -192,6 +217,12 @@ function loadPlugins() {
             }));
             break;
         }
+        break;
+      case 'help':
+        exec('tellraw ' + player + ' ' + JSON.stringify({
+          text: 'ServerJS: <version|plugins|help>',
+          color: 'red'
+        }));
         break;
       default:
         exec('tellraw ' + player + ' ' + JSON.stringify({
