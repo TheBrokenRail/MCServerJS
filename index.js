@@ -122,7 +122,7 @@ function loadPlugins() {
   var files = fs.readdirSync('plugins');
   for (i = 0; i < files.length; i++) {
     var plugin = require('./plugins/' + files[i]);
-    Object.assign(commands, plugins.commands);
+    Object.assign(commands, plugin.commands);
     plugins[i] = plugin.meta;
   }
   commands.serverjs = function (player, args, exec) {
@@ -135,8 +135,10 @@ function loadPlugins() {
             if (version === 'custom?' + customVersions[x]) version = x;
           }
         }
+        if (version === 'latest-release') version = 'Latest Release';
+        if (version === 'latest-snapshot') version = 'Latest Snapshot';
         exec('tellraw ' + player + ' ' + JSON.stringify({
-          text: 'NodeJS: ' + process.version + '\nMinecraft: ' + config.version,
+          text: 'NodeJS: ' + process.version + '\nMinecraft: ' + version,
           color: 'yellow'
         }));
         break;
@@ -145,7 +147,7 @@ function loadPlugins() {
           case 'list':
             var text = 'Listing All Plugins:\n';
             for (k = 0; k < plugins.length; k++) {
-              text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[i].description + '\n';
+              text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
             exec('tellraw ' + player + ' ' + JSON.stringify({
               text: text,
