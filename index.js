@@ -84,7 +84,7 @@ function build() {
     var url = '';
     var pluginMinimum = null;
     for (i = 0; i < versionsJson.versions.length; i++) {
-      if ('1.8' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime).getTime();
+      if ('1.7.2' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime).getTime();
     }
     for (i = 0; i < versionsJson.versions.length; i++) {
       if (version === versionsJson.versions[i].id) {
@@ -102,7 +102,7 @@ function build() {
     fs.writeFileSync('server/server.jar', jar.getBody());
   } else {
     if (fs.existsSync('jars/manifest.json')) {
-      customVersions = JSON.parse(fs.readFileSync('jars/manifest.json', 'utf8'));
+      var customVersions = require('jars/manifest');
       for (x in customVersions) {
         if ('custom?' + customVersions[x] === config.version && fs.existsSync('jars/' + customVersions[x])) {
           fs.copyFileSync('jars/' + customVersions[x], 'server/server.jar');
@@ -149,7 +149,7 @@ function loadPlugins() {
       case 'version':
         var version = config.version;
         if (version.startsWith('custom?')) {
-          customVersions = require('jars/manifest');
+          var customVersions = require('jars/manifest');
           for (x in customVersions) {
             if (version === 'custom?' + customVersions[x]) version = x;
           }
@@ -327,7 +327,7 @@ if (process.argv.indexOf('--headless') === -1) {
     versions.push(['Latest Release', 'latest-release']);
     versions.push(['Latest Snapshot', 'latest-snapshot']);
     if (fs.existsSync('jars/manifest.json')) {
-      customVersions = require('jars/manifest');
+      var customVersions = require('jars/manifest');
       for (x in customVersions) {
         if (fs.existsSync('jars/' + customVersions[x])) versions.push([x, 'custom?' + customVersions[x]]);
       }
