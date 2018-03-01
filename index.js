@@ -113,6 +113,80 @@ function build() {
 }
 var server = null;
 var log = '';
+var commands = {};
+var plugins = [];
+function loadPlugins() {
+  commands = {};
+  plugins = [];
+  if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
+  var files = fs.readdirSync('plugins');
+  for (i = 0; i < files.length; i++) {
+    var plugin = require('plugins/' + files[i]);
+    Object.assign(commands, plugins.commands);
+    plugins[i] = plugin.meta;
+  }
+  commands.serverjs = function (player, args, exec) {
+    switch (args[0]) {
+      case 'version':
+        var version = config.version;
+        if (version.startsWith('custom?')) {
+          customVersions = require('jars/manifest');
+          for (x in customVersions) {
+            if (version === 'custom?' + customVersions[x]) version = x;
+          }
+        }
+        exec('tellraw ' + player + ' ' + JSON.stringify({
+          text: 'NodeJS: ' + process.version + '\nMinecraft: ' + config.version,
+          color: 'yellow'
+        }));
+        break;
+      case 'plugins':
+        switch (args[1]) {
+          case 'list':
+            var text = 'Listing All Plugins:\n';
+            for (k = 0; k < plugins.length; k++) {
+              text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[i].description + '\n';
+            }
+            exec('tellraw ' + player + ' ' + JSON.stringify({
+              text: text,
+              color: 'yellow'
+            }));
+            break;
+          case 'reload':
+            exec('tellraw ' + player + ' ' + JSON.stringify({
+              text: 'Reloading All Plugins',
+              color: 'yellow'
+            }));
+            loadPlugins();
+            break;
+          case 'commands':
+            var text = 'Listing All Commands:\n';
+            for (x in commands) {
+              text = text + x + '\n';
+            }
+            exec('tellraw ' + player + ' ' + JSON.stringify({
+              text: text,
+              color: 'yellow'
+            }));
+            break;
+          default:
+            exec('tellraw ' + player + ' ' + JSON.stringify({
+              text: 'Please Specify A Command!',
+              color: 'red'
+            }));
+            break;
+        }
+        break;
+      default:
+        exec('tellraw ' + player + ' ' + JSON.stringify({
+          text: 'Please Specify A Command!',
+          color: 'red'
+        }));
+        break;
+    }
+  };
+}
+loadPlugins();
 function runCommand(str, stdin, commands) {
   if (str.split(']: ').length > 1) str = str.split(']: ')[1];
   for (x in commands) {
@@ -136,7 +210,6 @@ function runCommand(str, stdin, commands) {
     }
   }
 }
-var scriptObj = require('./script');
 function run() {
   if (server) {
     server.kill();
@@ -161,7 +234,7 @@ function run() {
     server.stdout.on('data', chunk => {
       log = log + chunk.toString();
       process.stdout.write(chunk.toString());
-      runCommand(chunk.toString(), server.stdin, scriptObj.commands);
+      runCommand(chunk.toString(), server.stdin, commands);
     });
     server.stderr.on('data', chunk => {
       log = log + chunk.toString();
@@ -198,7 +271,7 @@ if (process.argv.indexOf('--headless') === -1) {
     versions.push(['Latest Release', 'latest-release']);
     versions.push(['Latest Snapshot', 'latest-snapshot']);
     if (fs.existsSync('jars/manifest.json')) {
-      customVersions = JSON.parse(fs.readFileSync('jars/manifest.json', 'utf8'));
+      customVersions = require('jars/manifest');
       for (x in customVersions) {
         if (fs.existsSync('jars/' + customVersions[x])) versions.push([x, 'custom?' + customVersions[x]]);
       }
