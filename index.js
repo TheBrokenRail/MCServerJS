@@ -184,9 +184,9 @@ function loadPlugins() {
                 if (plugins[k].commands.hasOwnProperty(x)) {
                   done = true;
                   if (plugins[k].commands[x].args.length > 0) {
-                    text = text + x + ' ' + plugins[k].commands[x].args + ': ' plugins[k].commands[x].description + '\n';
+                    text = text + x + ' ' + plugins[k].commands[x].args + ': ' + plugins[k].commands[x].description + '\n';
                   } else {
-                    text = text + x + ': ' plugins[k].commands[x].description + '\n';
+                    text = text + x + ': ' + plugins[k].commands[x].description + '\n';
                   }
                 }
               }
