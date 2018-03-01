@@ -235,7 +235,7 @@ function loadPlugins() {
 }
 loadPlugins();
 function runCommand(str, stdin, commands) {
-  if (str.split(']: ').length > 1) str = str.split(']: ')[1];
+  if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
   for (x in commands) {
     var cmdArr = str.split('<');
     if (cmdArr.length > 1) {
