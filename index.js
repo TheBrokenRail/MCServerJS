@@ -145,14 +145,19 @@ function loadPlugins() {
       case 'plugins':
         switch (args[1]) {
           case 'list':
-            var text = 'Listing All Plugins:\n';
+            var text = '';
             for (k = 0; k < plugins.length; k++) {
               text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify({
-              text: text,
-              color: 'yellow'
-            }));
+            exec('tellraw ' + player + ' ' + JSON.stringify(['', {
+                text: 'Listing All Plugins:\n',
+                color: 'yellow'
+              },
+              {
+                text: text,
+                color: 'gold'
+              }
+            ]));
             break;
           case 'reload':
             exec('tellraw ' + player + ' ' + JSON.stringify({
@@ -162,14 +167,23 @@ function loadPlugins() {
             loadPlugins();
             break;
           case 'commands':
-            var text = 'Listing All Commands:\n';
+            var text = '';
             for (x in commands) {
-              text = text + x + '\n';
+              for (k = 0; k < plugins.length; k++) {
+                if (plugins[k].commands.hasOwnProperty(x)) {
+                  text = text + x + ' ' + plugins[k].commands[x].args + ': ' plugins[k].commands[x].description + '\n';
+                }
+              }
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify({
-              text: text,
-              color: 'yellow'
-            }));
+            exec('tellraw ' + player + ' ' + JSON.stringify(['', {
+                text: 'Listing All Commands:\n',
+                color: 'yellow'
+              },
+              {
+                text: text,
+                color: 'gold'
+              }
+            ]));
             break;
           default:
             exec('tellraw ' + player + ' ' + JSON.stringify({
