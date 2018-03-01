@@ -7,5 +7,10 @@ module.exports = {
     args: function (player, args, exec) {
       exec('tellraw ' + player + ' ' + JSON.stringify({text: JSON.stringify(args, null, 2), color: 'yellow'}));
     }
+  },
+  meta: {
+    name: 'Sample Plugin',
+    version: '1.0.0',
+    description: 'Sample Plugin With Custom Skull and Argruments Test Commands'
   }
 };
