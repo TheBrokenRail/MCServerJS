@@ -113,6 +113,7 @@ function build() {
 var server = null;
 var log = '';
 function runCommand(str, stdin, commands) {
+  if (str.split(']: ').length > 1) str = chunk.toString().split(']: ')[1];
   for (x in commands) {
     var cmdArr = str.split('<');
     if (cmdArr.length > 1) {
@@ -126,7 +127,7 @@ function runCommand(str, stdin, commands) {
           });
         } catch (e) {
           stdin.write('tellraw ' + player + ' ' + JSON.stringify({
-            text: e.toString(),
+            text: e.stack,
             color: 'red'
           }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
         }
@@ -159,9 +160,7 @@ function run() {
     server.stdout.on('data', chunk => {
       log = log + chunk.toString();
       process.stdout.write(chunk.toString());
-      var str = chunk.toString();
-      if (str.split(']: ').length > 1) str = chunk.toString().split(']: ')[1];
-      runCommand(str, server.stdin, scriptObj.commands);
+      runCommand(chunk.toString(), server.stdin, scriptObj.commands);
     });
     server.stderr.on('data', chunk => {
       log = log + chunk.toString();
