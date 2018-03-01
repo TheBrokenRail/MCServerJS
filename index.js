@@ -133,7 +133,7 @@ function loadPlugins() {
   for (i = 0; i < files.length; i++) {
     var plugin = require('./plugins/' + files[i]);
     Object.assign(commands, plugin.commands);
-    plugins[i] = plugin.meta;
+    plugins.push(plugin.meta);
   }
   commands.serverjs = function (player, args, exec) {
     switch (args[0]) {
@@ -221,7 +221,7 @@ function loadPlugins() {
       case 'help':
         exec('tellraw ' + player + ' ' + JSON.stringify({
           text: 'ServerJS: <version|plugins|help>',
-          color: 'red'
+          color: 'yellow'
         }));
         break;
       default:
