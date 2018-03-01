@@ -114,7 +114,7 @@ function build() {
 var server = null;
 var log = '';
 function runCommand(str, stdin, commands) {
-  if (str.split(']: ').length > 1) str = chunk.toString().split(']: ')[1];
+  if (str.split(']: ').length > 1) str = str.split(']: ')[1];
   for (x in commands) {
     var cmdArr = str.split('<');
     if (cmdArr.length > 1) {
