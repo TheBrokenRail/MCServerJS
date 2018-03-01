@@ -121,7 +121,7 @@ function loadPlugins() {
   if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
   var files = fs.readdirSync('plugins');
   for (i = 0; i < files.length; i++) {
-    var plugin = require('plugins/' + files[i]);
+    var plugin = require('./plugins/' + files[i]);
     Object.assign(commands, plugins.commands);
     plugins[i] = plugin.meta;
   }
