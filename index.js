@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const rimraf = require('rimraf');
+const escapeString = require('escape-string-regexp');
 const request = require('sync-request');
 const { spawn } = require('child_process');
 const express = require('express');
@@ -127,7 +128,7 @@ function runCommand(str, stdin, commands) {
           });
         } catch (e) {
           stdin.write('tellraw ' + player + ' ' + JSON.stringify({
-            text: e.stack,
+            text: e.stack.replace(new RegExp(escapeString(__dirname), 'g'), '<MODULE ROOT>'),
             color: 'red'
           }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
         }
