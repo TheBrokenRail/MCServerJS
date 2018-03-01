@@ -70,7 +70,9 @@ gamemode=${config.gamemode}
 max-players=${config.maxPlayers}
 motd=${config.motd}`;
 }
+var pluginsEnabled = true;
 function build() {
+  pluginsEnabled = true;
   rimraf.sync('server');
   fs.mkdirSync('server');
   if (!config.version.startsWith('custom?')) {
@@ -80,8 +82,15 @@ function build() {
     if (version === 'latest-release') version = versionsJson.latest.release;
     if (version === 'latest-snapshot') version = versionsJson.latest.snapshot;
     var url = '';
+    var pluginMinimum = null;
     for (i = 0; i < versionsJson.versions.length; i++) {
-      if (version === versionsJson.versions[i].id) url = versionsJson.versions[i].url;
+      if ('1.8' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime).getTime();
+    }
+    for (i = 0; i < versionsJson.versions.length; i++) {
+      if (version === versionsJson.versions[i].id) {
+        url = versionsJson.versions[i].url;
+        if (new Date(versionsJson.versions[i].releaseTime).getTime() < pluginMinimum) pluginsEnabled = false;
+      }
     }
     var jarRes = request('GET', url);
     var versionJson = JSON.parse(jarRes.getBody());
@@ -135,7 +144,7 @@ function loadPlugins() {
     Object.assign(commands, plugin.commands);
     plugins.push(plugin.meta);
   }
-  commands.serverjs = function (player, args, exec) {
+  commands.serverjs = function (player, args, exec, version) {
     switch (args[0]) {
       case 'version':
         var version = config.version;
@@ -246,7 +255,7 @@ function runCommand(str, stdin, commands) {
         try {
           commands[x](player, args, function(cmd) {
             stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-          });
+          }, config.version);
         } catch (e) {
           stdin.write('tellraw ' + player + ' ' + JSON.stringify({
             text: e.stack.replace(new RegExp(escapeString(__dirname), 'g'), '<MODULE ROOT>'),
@@ -281,7 +290,7 @@ function run() {
     server.stdout.on('data', chunk => {
       log = log + chunk.toString();
       process.stdout.write(chunk.toString());
-      runCommand(chunk.toString(), server.stdin, commands);
+      if (pluginsEnabled) runCommand(chunk.toString(), server.stdin, commands);
     });
     server.stderr.on('data', chunk => {
       log = log + chunk.toString();
