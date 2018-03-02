@@ -4,7 +4,8 @@ const request = require('sync-request');
 const { spawn } = require('child_process');
 const express = require('express');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+const LevelStore = require('express-session-level')(session);
+const db = require('level')('./sessions');
 const app = express();
   
 if (process.argv.indexOf('--headless') === -1) {
@@ -15,7 +16,7 @@ if (process.argv.indexOf('--headless') === -1) {
     secret: 'NodeJs Minecraft Server',
     saveUninitialized: true,
     resave: true,
-    store: new FileStore()
+    store: new LevelStore(db)
   }));
   app.use((req, res, next) => {
     if (config.users.length < 1) {
