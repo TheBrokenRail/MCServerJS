@@ -133,8 +133,13 @@ var server = null;
 var log = '';
 var commands = {};
 var plugins = [];
+var killPlugin = [];
 function loadPlugins(playerOutput) {
   commands = {};
+  for (i = 0; i < killPlugin.length) {
+    killPlugin[i]();
+    delete killPlugin[i];
+  }
   plugins = [{
     name: 'ServerJS Built-In',
     version: '1.0.0',
@@ -178,6 +183,7 @@ function loadPlugins(playerOutput) {
       delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
       plugin.init(exec);
+      if (plugin.hasOwnProperty('kill')) killPlugin.push(plugin.kill);
     } catch(e) {
       fail(e.toString());
     }
@@ -229,7 +235,7 @@ function loadPlugins(playerOutput) {
               text: 'Reloading All Plugins',
               color: 'yellow'
             }));
-            loadPlugins(player);
+            loadPlugins(data.player);
             break;
           case 'commands':
             var text = '';
