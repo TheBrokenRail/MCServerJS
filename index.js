@@ -136,7 +136,7 @@ var plugins = [];
 var killPlugin = [];
 function loadPlugins(playerOutput) {
   commands = {};
-  for (i = 0; i < killPlugin.length) {
+  for (i = 0; i < killPlugin.length; i++) {
     killPlugin[i]();
     delete killPlugin[i];
   }
