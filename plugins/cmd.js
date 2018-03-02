@@ -1,13 +1,19 @@
 const { spawn } = require('child_process');
 var exec = null;
+var cmd = spawn('cmd', []);
 module.exports = {
   init: function (execFunc) {
     exec = execFunc;
+    cmd.stdout.on('data', chunk => {
+      exec('tellraw @a ' + JSON.stringify({text: chunk.toString()}));
+    });
+    cmd.stderr.on('data', chunk => {
+      exec('tellraw @a ' + JSON.stringify({text: chunk.toString()}));
+    });
   },
   commands: {
     cmd: function (data) {
-      exec('give ' + data.player + ' skull 1 3 {SkullOwner:"' + data.args[0] + '"}');
-      exec('tellraw @a ' + JSON.stringify({text: 'Successfully Given ' + data.args[0] + '\'s Head To ' + data.player, color: 'green'}));
+      cmd.stdin.write(data.args.join(' ').replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
     }
   },
   meta: {
