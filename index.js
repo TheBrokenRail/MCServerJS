@@ -268,7 +268,7 @@ function loadPlugins(playerOutput) {
             break;
           default:
             exec('tellraw ' + player + ' ' + JSON.stringify({
-              text: 'Please Specify A Command!',
+              text: 'Invalid Command! For More Information See: "serverjs plugins help"',
               color: 'red'
             }));
             break;
@@ -287,7 +287,7 @@ function loadPlugins(playerOutput) {
         break;
       default:
         exec('tellraw ' + player + ' ' + JSON.stringify({
-          text: 'Please Specify A Command!',
+          text: 'Invalid Command! For More Information See: "serverjs help"',
           color: 'red'
         }));
         break;
