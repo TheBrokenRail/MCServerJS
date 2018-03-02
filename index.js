@@ -45,7 +45,8 @@ const defaultConfig = {
   users: [
     ['admin', 'password']
   ],
-  saveServerData: true
+  saveServerData: true,
+  pluginsEnabled: true
 };
 var config = null;
 function load() {
@@ -70,9 +71,9 @@ gamemode=${config.gamemode}
 max-players=${config.maxPlayers}
 motd=${config.motd}`;
 }
-var pluginsEnabled = true;
+var pluginsEnabled = config.pluginsEnabled;
 function build() {
-  pluginsEnabled = true;
+  pluginsEnabled = config.pluginsEnabled;
   rimraf.sync('server');
   fs.mkdirSync('server');
   if (!config.version.startsWith('custom?')) {
@@ -89,7 +90,13 @@ function build() {
     for (i = 0; i < versionsJson.versions.length; i++) {
       if (version === versionsJson.versions[i].id) {
         url = versionsJson.versions[i].url;
-        if (new Date(versionsJson.versions[i].releaseTime).getTime() < pluginMinimum) pluginsEnabled = false;
+        if (new Date(versionsJson.versions[i].releaseTime).getTime() < pluginMinimum) {
+          pluginsEnabled = false;
+          if (config.pluginsEnabled) {
+            log = log + 'Disabling Plugins Due To Old Version Of Minecraft (<1.7.2)\n';
+            console.log('Disabling Plugins Due To Old Version Of Minecraft (<1.7.2)');
+          }
+        }
       }
     }
     var jarRes = request('GET', url);
