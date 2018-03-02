@@ -267,6 +267,7 @@ function runCommand(str, stdin, commands) {
             text: e.toString(),
             color: 'red'
           }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+          log = log + e.stack + '\n';
           console.error(e);
         }
       }
