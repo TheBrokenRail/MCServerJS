@@ -178,8 +178,8 @@ function loadPlugins(playerOutput) {
       fail(e.toString());
     }
     if (plugin && !plugin.hasOwnProperty('meta')) fail('No Plugin Metadata');
-    if (plugin && plugin.hasOwnProperty('meta') && plugin.meta.hasOwnProperty('name')) fail('No Plugin Name');
-    if (plugin && plugin.hasOwnProperty('meta') && plugin.meta.hasOwnProperty('version')) fail('No Plugin Version');
+    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('name')) fail('No Plugin Name');
+    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('version')) fail('No Plugin Version');
     if (!failed) pluginName = plugin.name + ' ' + plugin.version;
     if (plugin && !plugin.hasOwnProperty('commands')) fail('No Plugin Commands');
     if (!failed) Object.assign(commands, plugin.commands);
