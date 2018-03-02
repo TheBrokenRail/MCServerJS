@@ -85,12 +85,12 @@ function build() {
     var url = '';
     var pluginMinimum = null;
     for (i = 0; i < versionsJson.versions.length; i++) {
-      if ('1.7.2' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime).getTime();
+      if ('1.7.2' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime);
     }
     for (i = 0; i < versionsJson.versions.length; i++) {
       if (version === versionsJson.versions[i].id) {
         url = versionsJson.versions[i].url;
-        if (new Date(versionsJson.versions[i].releaseTime).getTime() < pluginMinimum) {
+        if (new Date(versionsJson.versions[i].releaseTime) < pluginMinimum) {
           pluginsEnabled = false;
           if (config.pluginsEnabled) {
             log = log + 'Disabling Plugins Due To Old Version Of Minecraft (<1.7.2)\n';
