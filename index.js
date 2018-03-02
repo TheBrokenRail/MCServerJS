@@ -152,6 +152,9 @@ function loadPlugins(playerOutput) {
     var plugin = null;
     var failed = false;
     var pluginName = files[i];
+    const exec = function (cmd) {
+      server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+    };
     function fail(message) {
       failed = true;
       if (playerOutput) {
@@ -174,6 +177,7 @@ function loadPlugins(playerOutput) {
     try {
       delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
+      plugin.init(exec);
     } catch(e) {
       fail(e.toString());
     }
@@ -186,10 +190,10 @@ function loadPlugins(playerOutput) {
     if (!failed) success();
     if (!failed) plugins.push(plugin.meta);
   }
-  commands.serverjs = function (player, args, exec, version) {
-    switch (args[0]) {
+  commands.serverjs = function (data) {
+    switch (data.args[0]) {
       case 'version':
-        var version = config.version;
+        var version = data.version;
         if (version.startsWith('custom?')) {
           var customVersions = require('jars/manifest');
           for (x in customVersions) {
@@ -198,19 +202,19 @@ function loadPlugins(playerOutput) {
         }
         if (version === 'latest-release') version = 'Latest Release';
         if (version === 'latest-snapshot') version = 'Latest Snapshot';
-        exec('tellraw ' + player + ' ' + JSON.stringify({
+        exec('tellraw ' + data.player + ' ' + JSON.stringify({
           text: 'NodeJS: ' + process.version + '\nMinecraft: ' + version,
           color: 'yellow'
         }));
         break;
       case 'plugins':
-        switch (args[1]) {
+        switch (data.args[1]) {
           case 'list':
             var text = '';
             for (k = 0; k < plugins.length; k++) {
               text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'Listing All Plugins:\n',
                 color: 'yellow'
               },
@@ -221,7 +225,7 @@ function loadPlugins(playerOutput) {
             ]));
             break;
           case 'reload':
-            exec('tellraw ' + player + ' ' + JSON.stringify({
+            exec('tellraw ' + data.player + ' ' + JSON.stringify({
               text: 'Reloading All Plugins',
               color: 'yellow'
             }));
@@ -245,7 +249,7 @@ function loadPlugins(playerOutput) {
                 text = text + x + ': No Description\n';
               }
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'Listing All Commands:\n',
                 color: 'yellow'
               },
@@ -256,7 +260,7 @@ function loadPlugins(playerOutput) {
             ]));
             break;
           case 'help':
-            exec('tellraw ' + player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'USAGE:\n',
                 color: 'yellow'
               },
@@ -267,7 +271,7 @@ function loadPlugins(playerOutput) {
             ]));
             break;
           default:
-            exec('tellraw ' + player + ' ' + JSON.stringify({
+            exec('tellraw ' + data.player + ' ' + JSON.stringify({
               text: 'Invalid Command! For More Information See: "serverjs plugins help"',
               color: 'red'
             }));
@@ -275,7 +279,7 @@ function loadPlugins(playerOutput) {
         }
         break;
       case 'help':
-        exec('tellraw ' + player + ' ' + JSON.stringify([{
+        exec('tellraw ' + data.player + ' ' + JSON.stringify([{
             text: 'USAGE:\n',
             color: 'yellow'
           },
@@ -286,7 +290,7 @@ function loadPlugins(playerOutput) {
         ]));
         break;
       default:
-        exec('tellraw ' + player + ' ' + JSON.stringify({
+        exec('tellraw ' + data.player + ' ' + JSON.stringify({
           text: 'Invalid Command! For More Information See: "serverjs help"',
           color: 'red'
         }));
@@ -294,7 +298,6 @@ function loadPlugins(playerOutput) {
     }
   };
 }
-loadPlugins(null);
 function runCommand(str, stdin, commands) {
   if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
   if (str.startsWith('<')) {
@@ -306,9 +309,7 @@ function runCommand(str, stdin, commands) {
         if (cmd.startsWith(' ' + x)) {
           var args = cmd.split(' ' + x)[1].trim().split(' ');
           try {
-            commands[x](player, args, function(cmd) {
-              stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-            }, config.version);
+            commands[x]({player: player, args: args, version: config.version});
           } catch (e) {
             stdin.write('tellraw ' + player + ' ' + JSON.stringify({
               text: e.toString(),
@@ -327,6 +328,7 @@ function run() {
     server.kill();
   }
   var success = build();
+  loadPlugins(null);
   if (success) {
     server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {cwd: 'server'});
     server.on('close', () => {
