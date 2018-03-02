@@ -148,13 +148,13 @@ function loadPlugins(playerOutput) {
   }];
   if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
   var files = fs.readdirSync('plugins');
+  const exec = function (cmd) {
+    server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+  };
   for (i = 0; i < files.length; i++) {
     var plugin = null;
     var failed = false;
     var pluginName = files[i];
-    const exec = function (cmd) {
-      server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-    };
     function fail(message) {
       failed = true;
       if (playerOutput) {
