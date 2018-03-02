@@ -139,6 +139,7 @@ function loadPlugins(playerOutput) {
   for (i = 0; i < killPlugin.length; i++) {
     killPlugin[i]();
     delete killPlugin[i];
+    killPlugin.splice(i, 1);
   }
   plugins = [{
     name: 'ServerJS Built-In',
@@ -334,7 +335,17 @@ function run() {
     server.kill();
   }
   var success = build();
-  loadPlugins(null);
+  if (pluginsEnabled) {
+    loadPlugins(null);
+  } else {
+    commands = {};
+    plugins = [];
+    for (i = 0; i < killPlugin.length; i++) {
+      killPlugin[i]();
+      delete killPlugin[i];
+      killPlugin.splice(i, 1);
+    }
+  }
   if (success) {
     server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {cwd: 'server'});
     server.on('close', () => {
