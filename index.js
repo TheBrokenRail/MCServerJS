@@ -141,7 +141,7 @@ function loadPlugins() {
     description: 'Contains Built In ServerJS Command',
     commands: {
       serverjs: {
-        args: '<version|plugins|help>',
+        args: ['version|plugins|help'],
         description: 'Built-In ServerJS Command'
       }
     }
@@ -177,7 +177,7 @@ function loadPlugins() {
             for (k = 0; k < plugins.length; k++) {
               text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify(['', {
+            exec('tellraw ' + player + ' ' + JSON.stringify([{
                 text: 'Listing All Plugins:\n',
                 color: 'yellow'
               },
@@ -202,7 +202,7 @@ function loadPlugins() {
                 if (plugins[k].commands.hasOwnProperty(x)) {
                   done = true;
                   if (plugins[k].commands[x].args.length > 0) {
-                    text = text + x + ' ' + plugins[k].commands[x].args + ': ' + plugins[k].commands[x].description + '\n';
+                    text = text + x + ' <' + plugins[k].commands[x].args.join('> <') + '>: ' + plugins[k].commands[x].description + '\n';
                   } else {
                     text = text + x + ': ' + plugins[k].commands[x].description + '\n';
                   }
@@ -212,7 +212,7 @@ function loadPlugins() {
                 text = text + x + ': No Description\n';
               }
             }
-            exec('tellraw ' + player + ' ' + JSON.stringify(['', {
+            exec('tellraw ' + player + ' ' + JSON.stringify([{
                 text: 'Listing All Commands:\n',
                 color: 'yellow'
               },
@@ -223,10 +223,15 @@ function loadPlugins() {
             ]));
             break;
           case 'help':
-            exec('tellraw ' + player + ' ' + JSON.stringify({
-              text: 'ServerJS: plugins <list|reload|commands|help>',
-              color: 'yellow'
-            }));
+            exec('tellraw ' + player + ' ' + JSON.stringify([{
+                text: 'USAGE:\n',
+                color: 'yellow'
+              },
+              {
+                text: 'serverjs plugins <list|reload|commands|help>',
+                color: 'gold'
+              }
+            ]));
             break;
           default:
             exec('tellraw ' + player + ' ' + JSON.stringify({
@@ -237,10 +242,15 @@ function loadPlugins() {
         }
         break;
       case 'help':
-        exec('tellraw ' + player + ' ' + JSON.stringify({
-          text: 'ServerJS: <version|plugins|help>',
-          color: 'yellow'
-        }));
+        exec('tellraw ' + player + ' ' + JSON.stringify([{
+            text: 'USAGE:\n',
+            color: 'yellow'
+          },
+          {
+            text: 'serverjs <version|plugins|help>',
+            color: 'gold'
+          }
+        ]));
         break;
       default:
         exec('tellraw ' + player + ' ' + JSON.stringify({
