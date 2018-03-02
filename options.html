@@ -20,6 +20,7 @@
   <span>RAM: </span><input class="form-control" id="ram"></input><span> GB</span><br /><br />
   <label class="checkbox-inline"><input type="checkbox" id="deleteWorld"><span>Delete World On Save</span></label><br /><br />
   <label class="checkbox-inline"><input type="checkbox" id="saveServerData"><span>Save White-list, Bans, and OPs on Server Restart</span></label><br /><br />
+  <label class="checkbox-inline"><input type="checkbox" id="pluginsEnabled"><span>Use Javascript Plugins</span></label><br /><br />
   <button class="btn btn-default" id="save">Save</button> <button class="btn btn-default" id="clearLog">Clear Log</button><br />
 </div>
 <textarea id="log" disabled style="position: absolute; top: 0; left: 50%; height: calc(100% - 32px); width: 50%; resize: none; overflow: hidden;"></textarea>
@@ -101,6 +102,9 @@ document.getElementById('ram').oninput = function () {
 document.getElementById('saveServerData').onchange = function () {
   config.saveServerData = document.getElementById('saveServerData').checked;
 };
+document.getElementById('pluginsEnabled').onchange = function () {
+  config.pluginsEnabled = document.getElementById('pluginsEnabled').checked;
+};
 document.getElementById('port').value = config.port;
 document.getElementById('seed').value = config.seed;
 document.getElementById('pvp').checked = config.pvp;
@@ -114,4 +118,5 @@ document.getElementById('maxPlayers').value = config.maxPlayers;
 document.getElementById('motd').value = config.motd;
 document.getElementById('ram').value = config.ram;
 document.getElementById('saveServerData').checked = config.saveServerData;
+document.getElementById('pluginsEnabled').checked = config.pluginsEnabled;
 </script>
