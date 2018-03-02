@@ -133,7 +133,7 @@ var server = null;
 var log = '';
 var commands = {};
 var plugins = [];
-function loadPlugins() {
+function loadPlugins(playerOutput) {
   commands = {};
   plugins = [{
     name: 'ServerJS Built-In',
@@ -149,9 +149,42 @@ function loadPlugins() {
   if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
   var files = fs.readdirSync('plugins');
   for (i = 0; i < files.length; i++) {
-    var plugin = require('./plugins/' + files[i]);
-    Object.assign(commands, plugin.commands);
-    plugins.push(plugin.meta);
+    var plugin = null;
+    var failed = false;
+    var pluginName = files[i];
+    function fail(message) {
+      failed = true;
+      if (playerOutput) {
+        server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
+          text: 'Error Loading Plugin ' + pluginName + ': ' + message,
+          color: 'red'
+        }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+      }
+      log = log + 'Error Loading Plugin ' + pluginName + ': ' + message + '\n';
+      console.log('Error Loading Plugin ' + pluginName + ': ' + message);
+    }
+    function success() {
+      if (playerOutput) {
+        server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
+          text: 'Successfully Loaded Plugin  ' + pluginName,
+          color: 'green'
+        }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+      }
+    }
+    try {
+      if (require.cache.hasOwnProperty(require.resolve('./plugins/' + files[i]))) delete require.cache[require.resolve('./plugins/' + files[i])];
+      plugin = require('./plugins/' + files[i]);
+    } catch(e) {
+      fail(e.toString());
+    }
+    if (plugin && !plugin.hasOwnProperty('meta')) fail('No Plugin Metadata');
+    if (plugin && plugin.hasOwnProperty('meta') && plugin.meta.hasOwnProperty('name')) fail('No Plugin Name');
+    if (plugin && plugin.hasOwnProperty('meta') && plugin.meta.hasOwnProperty('version')) fail('No Plugin Version');
+    if (!failed) pluginName = plugin.name + ' ' + plugin.version;
+    if (plugin && !plugin.hasOwnProperty('commands')) fail('No Plugin Commands');
+    if (!failed) Object.assign(commands, plugin.commands);
+    if (!failed) success();
+    if (!failed) plugins.push(plugin.meta);
   }
   commands.serverjs = function (player, args, exec, version) {
     switch (args[0]) {
@@ -192,7 +225,7 @@ function loadPlugins() {
               text: 'Reloading All Plugins',
               color: 'yellow'
             }));
-            loadPlugins();
+            loadPlugins(player);
             break;
           case 'commands':
             var text = '';
@@ -261,7 +294,7 @@ function loadPlugins() {
     }
   };
 }
-loadPlugins();
+loadPlugins(null);
 function runCommand(str, stdin, commands) {
   if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
   if (str.startsWith('<')) {
