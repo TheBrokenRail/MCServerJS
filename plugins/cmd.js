@@ -26,5 +26,8 @@ module.exports = {
         description: 'Send Command To Command Prompt'
       }
     }
+  },
+  kill: function () {
+    cmd.kill();
   }
 };
