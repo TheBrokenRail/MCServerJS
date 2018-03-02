@@ -253,25 +253,27 @@ function loadPlugins() {
 }
 loadPlugins();
 function runCommand(str, stdin, commands) {
-  if (str.split(']: <').length > 1) str = str.split(']: ').slice(1).join(']: ');
-  for (x in commands) {
-    var cmdArr = str.split('<');
-    if (cmdArr.length > 1) {
-      var player = cmdArr[1].split('>')[0];
-      var cmd = cmdArr[1].split('>').slice(1).join('>');
-      if (cmd.startsWith(' ' + x)) {
-        var args = cmd.split(' ' + x)[1].trim().split(' ');
-        try {
-          commands[x](player, args, function(cmd) {
-            stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-          }, config.version);
-        } catch (e) {
-          stdin.write('tellraw ' + player + ' ' + JSON.stringify({
-            text: e.toString(),
-            color: 'red'
-          }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
-          log = log + e.stack + '\n';
-          console.error(e);
+  if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
+  if (str.startsWith('<')) {
+    for (x in commands) {
+      var cmdArr = str.split('<');
+      if (cmdArr.length > 1) {
+        var player = cmdArr[1].split('>')[0];
+        var cmd = cmdArr.slice(1).join('<').split('>').slice(1).join('>');
+        if (cmd.startsWith(' ' + x)) {
+          var args = cmd.split(' ' + x)[1].trim().split(' ');
+          try {
+            commands[x](player, args, function(cmd) {
+              stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+            }, config.version);
+          } catch (e) {
+            stdin.write('tellraw ' + player + ' ' + JSON.stringify({
+              text: e.toString(),
+              color: 'red'
+            }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+            log = log + e.stack + '\n';
+            console.error(e);
+          }
         }
       }
     }
