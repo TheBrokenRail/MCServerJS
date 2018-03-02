@@ -4,6 +4,7 @@ var cmd = spawn('cmd', []);
 module.exports = {
   init: function (execFunc) {
     exec = execFunc;
+    exec('tellraw @a ' + JSON.stringify({text: 'DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER', color: 'yellow'}));
     cmd.stdout.on('data', chunk => {
       exec('tellraw @a ' + JSON.stringify({text: chunk.toString().replace(new RegExp('\r', 'g'), '')}));
     });
@@ -13,6 +14,7 @@ module.exports = {
   },
   commands: {
     cmd: function (data) {
+      exec('tellraw @a ' + JSON.stringify({text: 'DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER', color: 'yellow'}));
       cmd.stdin.write(data.args.join(' ').replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
     }
   },
