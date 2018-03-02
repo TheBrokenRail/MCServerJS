@@ -155,7 +155,7 @@ function loadPlugins(playerOutput) {
   if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
   var files = fs.readdirSync('plugins');
   const exec = function (cmd) {
-    server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+    if (server && server.stdin) server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
   };
   for (i = 0; i < files.length; i++) {
     var plugin = null;
