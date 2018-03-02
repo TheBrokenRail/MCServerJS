@@ -19,9 +19,9 @@ module.exports = {
     }
   },
   meta: {
-    name: 'CMD',
+    name: 'Command Prompt Sample Plugin',
     version: '1.0.0',
-    description: 'Command Prompt In NodeJS',
+    description: 'Control Command Prompt In Minecraft',
     commands: {
       cmd: {
         args: ['Command'],
