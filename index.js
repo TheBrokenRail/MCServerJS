@@ -172,7 +172,7 @@ function loadPlugins(playerOutput) {
       }
     }
     try {
-      if (Object.prototype.hasOwnProperty(require.cache, require.resolve('./plugins/' + files[i]))) delete require.cache[require.resolve('./plugins/' + files[i])];
+      delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
     } catch(e) {
       fail(e.toString());
