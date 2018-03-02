@@ -5,10 +5,10 @@ module.exports = {
   init: function (execFunc) {
     exec = execFunc;
     cmd.stdout.on('data', chunk => {
-      exec('tellraw @a ' + JSON.stringify({text: chunk.toString()}));
+      exec('tellraw @a ' + JSON.stringify({text: chunk.toString().replace(new RegExp('\r', 'g')}));
     });
     cmd.stderr.on('data', chunk => {
-      exec('tellraw @a ' + JSON.stringify({text: chunk.toString()}));
+      exec('tellraw @a ' + JSON.stringify({text: chunk.toString().replace(new RegExp('\r', 'g')}));
     });
   },
   commands: {
