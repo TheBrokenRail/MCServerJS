@@ -253,12 +253,12 @@ function loadPlugins() {
 }
 loadPlugins();
 function runCommand(str, stdin, commands) {
-  if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
+  if (str.split(']: <').length > 1) str = str.split(']: ').slice(1).join(']: ');
   for (x in commands) {
     var cmdArr = str.split('<');
     if (cmdArr.length > 1) {
       var player = cmdArr[1].split('>')[0];
-      var cmd = cmdArr[1].split('>')[1];
+      var cmd = cmdArr[1].split('>').slice(1).join('>');
       if (cmd.startsWith(' ' + x)) {
         var args = cmd.split(' ' + x)[1].trim().split(' ');
         try {
