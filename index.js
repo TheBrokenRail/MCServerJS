@@ -163,14 +163,25 @@ function loadPlugins(playerOutput) {
     var pluginName = files[i];
     function fail(message) {
       failed = true;
-      if (playerOutput) {
-        server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
-          text: 'Error Loading Plugin ' + pluginName + ': ' + message,
-          color: 'red'
-        }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+      if (message !== 'Plugin Disabled') {
+        if (playerOutput) {
+          server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
+            text: 'Error Loading Plugin ' + pluginName + ': ' + message,
+            color: 'red'
+          }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+        }
+        log = log + 'Error Loading Plugin ' + pluginName + ': ' + message + '\n';
+        console.log('Error Loading Plugin ' + pluginName + ': ' + message);
+      } else {
+        if (playerOutput) {
+          server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
+            text: 'Skipping Plugin ' + pluginName + ': ' + message,
+            color: 'yellow'
+          }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
+        }
+        log = log + 'Skipping Plugin ' + pluginName + ': ' + message + '\n';
+        console.log('Skipping Plugin ' + pluginName + ': ' + message);
       }
-      log = log + 'Error Loading Plugin ' + pluginName + ': ' + message + '\n';
-      console.log('Error Loading Plugin ' + pluginName + ': ' + message);
     }
     function success() {
       if (playerOutput) {
