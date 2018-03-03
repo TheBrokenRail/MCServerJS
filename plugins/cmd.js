@@ -3,6 +3,7 @@ var exec = null;
 var log = null;
 var cmd = spawn('cmd', []);
 module.exports = {
+  disabled: true,
   init: function (execFunc, logFunc) {
     exec = execFunc;
     log = logFunc;
