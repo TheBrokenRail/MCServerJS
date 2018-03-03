@@ -185,6 +185,7 @@ function loadPlugins(playerOutput) {
     try {
       delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
+      if (plugin.hasOwnProperty('disabled') && plugin.disabled) throw 'Plugin Disabled';
       if (plugin.hasOwnProperty('kill')) killPlugin.push(plugin.kill);
     } catch(e) {
       fail(e.toString());
