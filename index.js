@@ -170,7 +170,7 @@ function loadPlugins(playerOutput) {
         setTimeout(() => {
           callback(str);
           server.stdout.removeListener('data', listener);
-        }, 100);
+        }, 25);
       }
     }
   };
