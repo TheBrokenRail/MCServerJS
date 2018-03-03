@@ -1,5 +1,6 @@
 var exec = null;
 module.exports = {
+  disabled: true,
   init: function (execFunc, logFunc) {
     exec = execFunc;
   },
