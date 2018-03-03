@@ -5,7 +5,7 @@ module.exports = {
   },
   commands: {
     skull: function (data) {
-      exec('give ' + data.player + ' skull 1 3 {SkullOwner:"' + data.args[0] + '"}');
+      exec('give ' + data.player + ' skull 1 3 {SkullOwner:"' + data.args[0].replace(new RegExp('"', 'g'), '\\"') + '"}');
       exec('tellraw @a ' + JSON.stringify({text: 'Successfully Given ' + data.args[0] + '\'s Head To ' + data.player, color: 'green'}));
     },
     args: function (data) {
