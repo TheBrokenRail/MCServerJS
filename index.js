@@ -160,9 +160,11 @@ function loadPlugins(playerOutput) {
       if (callback) {
         var str = '';
         var listener = chunk => {
-          var strChunk = chunk.toString();
-          if (strChunk.split(']: ').length > 1) strChunk = strChunk.split(']: ').slice(1).join(']: ');
-          str = str + strChunk.replace(new RegExp('\r', 'g'), '');
+          var strChunk = chunk.toString().replace(new RegExp('\r', 'g'), '').split('\n');
+          for (i = 0; i < strChunk.length; i++) {
+            if (strChunk[i].split(']: ').length > 1) strChunk[i] = strChunk[i].split(']: ').slice(1).join(']: ');
+          }
+          str = str + strChunk.join('\n');
         };
         server.stdout.on('data', listener);
         setTimeout(() => {
