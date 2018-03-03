@@ -179,11 +179,12 @@ function loadPlugins(playerOutput) {
           color: 'green'
         }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
       }
+      log = log + 'Successfully Loaded Plugin ' + pluginName + '\n';
+      console.log('Successfully Loaded Plugin ' + pluginName);
     }
     try {
       delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
-      plugin.init(exec);
       if (plugin.hasOwnProperty('kill')) killPlugin.push(plugin.kill);
     } catch(e) {
       fail(e.toString());
@@ -191,11 +192,21 @@ function loadPlugins(playerOutput) {
     if (plugin && !plugin.hasOwnProperty('meta')) fail('No Plugin Metadata');
     if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('name')) fail('No Plugin Name');
     if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('version')) fail('No Plugin Version');
-    if (!failed) pluginName = plugin.meta.name + ' ' + plugin.meta.version;
     if (plugin && !plugin.hasOwnProperty('commands')) fail('No Plugin Commands');
-    if (!failed) Object.assign(commands, plugin.commands);
-    if (!failed) success();
-    if (!failed) plugins.push(plugin.meta);
+    if (!failed) {
+      pluginName = plugin.meta.name + ' ' + plugin.meta.version;
+      try {
+        plugin.init(exec, function (str) {
+          log = log + plugin.meta.name + ': ' + str + '\n';
+          console.log(plugin.meta.name + ': ' + str);
+        });
+      } catch(e) {
+        fail(e.toString());
+      }
+      Object.assign(commands, plugin.commands);
+      success();
+      plugins.push(plugin.meta);
+    }
   }
   commands.serverjs = function (data) {
     switch (data.args[0]) {
