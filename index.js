@@ -158,11 +158,17 @@ function loadPlugins(playerOutput) {
     if (server && server.stdout && server.stdin) {
       server.stdin.write(cmd.replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
       if (callback) {
+        var str = '';
         var listener = chunk => {
-          callback(chunk.toString());
-          server.stdout.removeListener('data', listener);
+          var strChunk = chunk.toString();
+          if (strChunk.split(']: ').length > 1) strChunk = strChunk.split(']: ').slice(1).join(']: ');
+          str = str + strChunk.replace(new RegExp('\r', 'g'), '');
         };
         server.stdout.on('data', listener);
+        setTimeout(() => {
+          callback(str);
+          server.stdout.removeListener('data', listener);
+        }, 250);
       }
     }
   };
