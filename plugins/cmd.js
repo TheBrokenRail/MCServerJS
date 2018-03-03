@@ -1,10 +1,13 @@
 const { spawn } = require('child_process');
 var exec = null;
+var log = null;
 var cmd = spawn('cmd', []);
 module.exports = {
-  init: function (execFunc) {
+  init: function (execFunc, logFunc) {
     exec = execFunc;
+    log = logFunc;
     exec('tellraw @a ' + JSON.stringify({text: 'DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER', color: 'yellow'}));
+    log('DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER');
     cmd.stdout.on('data', chunk => {
       exec('tellraw @a ' + JSON.stringify({text: chunk.toString().replace(new RegExp('\r', 'g'), '')}));
     });
@@ -14,7 +17,7 @@ module.exports = {
   },
   commands: {
     cmd: function (data) {
-      exec('tellraw @a ' + JSON.stringify({text: 'DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER', color: 'yellow'}));
+      exec('tellraw ' + data.player + ' ' + JSON.stringify({text: 'DISCLAIMER: THIS PLUGIN HAS HUGE SECURITY RISK IF ON A NON-WHITELISTED SERVER', color: 'yellow'}));
       cmd.stdin.write(data.args.join(' ').replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
     }
   },
