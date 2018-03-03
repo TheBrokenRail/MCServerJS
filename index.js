@@ -176,7 +176,7 @@ function loadPlugins(playerOutput) {
         if (playerOutput) {
           server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
             text: 'Skipping Plugin ' + pluginName + ': ' + message,
-            color: 'yellow'
+            color: 'gold'
           }).replace(new RegExp('\n', 'g'), '').replace(new RegExp('\r', 'g'), '') + '\n', 'utf8');
         }
         log = log + 'Skipping Plugin ' + pluginName + ': ' + message + '\n';
