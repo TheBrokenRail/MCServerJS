@@ -1,6 +1,6 @@
 var exec = null;
 module.exports = {
-  init: function (execFunc) {
+  init: function (execFunc, logFunc) {
     exec = execFunc;
   },
   commands: {
