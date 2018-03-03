@@ -23,7 +23,7 @@
   <label class="checkbox-inline"><input type="checkbox" id="pluginsEnabled"><span>Use Javascript Plugins</span></label><br /><br />
   <button class="btn btn-default" id="save">Save</button> <button class="btn btn-default" id="clearLog">Clear Log</button><br />
 </div>
-<textarea id="log" disabled style="position: absolute; top: 0; left: 50%; height: calc(100% - 32px); width: 50%; resize: none; overflow: hidden;"></textarea>
+<textarea id="log" disabled style="position: absolute; top: 0; left: 50%; height: calc(100% - 32px); width: 50%; resize: none; overflow: auto;"></textarea>
 <input id="command" style="position: absolute; top: calc(100% - 32px); left: 50%; height: 32px; width: 50%; resize: none;"></input>
 <script>
 var slider = new Slider("input#difficulty", {});
@@ -42,8 +42,9 @@ setInterval(function () {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
+      var oldLog = document.getElementById('log').value;
       document.getElementById('log').value = xhr.responseText;
-      document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+      if (oldLog !== xhr.responseText) document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
     }
   };
   xhr.open('GET', '/log');
