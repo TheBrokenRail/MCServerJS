@@ -1,7 +1,9 @@
 var exec = null;
+var log = null;
 module.exports = {
   init: function (execFunc, logFunc) {
     exec = execFunc;
+    log = logFunc;
   },
   commands: {
     skull: (data) => {
