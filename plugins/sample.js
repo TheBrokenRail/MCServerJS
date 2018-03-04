@@ -11,8 +11,8 @@ module.exports = {
     args: (data) => {
       exec('tellraw ' + data.player + ' ' + JSON.stringify({text: JSON.stringify(data.args, null, 2), color: 'yellow'}));
     },
-    cmd: (data) => {
-      exec(data.args.join(' '), (str) => {
+    getCords: (data) => {
+      exec('tp ' + data.player + ' ~ ~ ~', (str) => {
         exec('tellraw ' + data.player + ' ' + JSON.stringify({text: str}));
       });
     }
@@ -29,6 +29,10 @@ module.exports = {
       args: {
         args: ['Argruments'],
         description: 'Prints A JSON Array Of All Argruments'
+      },
+      getCords: {
+        args: [],
+        description: 'Returns Player Cordinates'
       }
     }
   }
