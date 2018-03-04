@@ -302,16 +302,16 @@ function loadPlugins(playerOutput) {
       case 'plugins':
         switch (data.args[1]) {
           case 'list':
-            let text = '';
+            var pluginList = '';
             for (k = 0; k < plugins.length; k++) {
-              text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
+              pluginList = pluginList + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
             exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'Listing All Plugins:\n',
                 color: 'yellow'
               },
               {
-                text: text,
+                text: pluginList,
                 color: 'gold'
               }
             ]));
@@ -324,21 +324,21 @@ function loadPlugins(playerOutput) {
             loadPlugins(data.player);
             break;
           case 'commands':
-            let text = '';
+            var commandList = '';
             for (x in commands) {
               var done = false;
               for (k = 0; k < plugins.length; k++) {
                 if (plugins[k].commands.hasOwnProperty(x)) {
                   done = true;
                   if (plugins[k].commands[x].args.length > 0) {
-                    text = text + x + ' <' + plugins[k].commands[x].args.join('> <') + '>: ' + plugins[k].commands[x].description + '\n';
+                    commandList = commandList + x + ' <' + plugins[k].commands[x].args.join('> <') + '>: ' + plugins[k].commands[x].description + '\n';
                   } else {
-                    text = text + x + ': ' + plugins[k].commands[x].description + '\n';
+                    commandList = commandList + x + ': ' + plugins[k].commands[x].description + '\n';
                   }
                 }
               }
               if (!done) {
-                text = text + x + ': No Description\n';
+                commandList = commandList + x + ': No Description\n';
               }
             }
             exec('tellraw ' + data.player + ' ' + JSON.stringify([{
@@ -346,7 +346,7 @@ function loadPlugins(playerOutput) {
                 color: 'yellow'
               },
               {
-                text: text,
+                text: commandList,
                 color: 'gold'
               }
             ]));
