@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "run": "node index.js",
-    "lint": "eslint ."
+    "lint": "eslint . --color"
   },
   "author": "TheBrokenRail",
   "repository": "TheBrokenRail/MCServerJS",
