@@ -302,7 +302,7 @@ function loadPlugins(playerOutput) {
       case 'plugins':
         switch (data.args[1]) {
           case 'list':
-            let pluginList = '';
+            var pluginList = '';
             for (k = 0; k < plugins.length; k++) {
               pluginList = pluginList + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
@@ -324,7 +324,7 @@ function loadPlugins(playerOutput) {
             loadPlugins(data.player);
             break;
           case 'commands':
-            let commandList = '';
+            var commandList = '';
             for (x in commands) {
               var done = false;
               for (k = 0; k < plugins.length; k++) {
