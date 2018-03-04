@@ -53,7 +53,9 @@ const defaultConfig = {
 var config = null;
 function load() {
   config = null;
-  if (fs.existsSync('config.json')) config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  if (fs.existsSync('config.json')) {
+    config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  }
   if (!config) {
     config = defaultConfig;
     save();
@@ -82,8 +84,12 @@ function build() {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
     var versionsJson = JSON.parse(versionsRes.getBody());
     var version = config.version;
-    if (version === 'latest-release') version = versionsJson.latest.release;
-    if (version === 'latest-snapshot') version = versionsJson.latest.snapshot;
+    if (version === 'latest-release') {
+      version = versionsJson.latest.release;
+    }
+    if (version === 'latest-snapshot') {
+      version = versionsJson.latest.snapshot;
+    }
     var url = '';
     var pluginMinimum = null;
     for (i = 0; i < versionsJson.versions.length; i++) {
@@ -152,7 +158,9 @@ function loadPlugins(playerOutput) {
       }
     }
   }];
-  if (!fs.existsSync('plugins')) fs.mkdirSync('plugins');
+  if (!fs.existsSync('plugins')) {
+    fs.mkdirSync('plugins');
+  }
   var files = fs.readdirSync('plugins');
   const exec = (cmd, callback) => {
     if (server && server.stdout && server.stdin) {
@@ -218,10 +226,18 @@ function loadPlugins(playerOutput) {
     } catch(e) {
       fail(e.toString());
     }
-    if (plugin && !plugin.hasOwnProperty('meta')) fail('No Plugin Metadata');
-    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('name')) fail('No Plugin Name');
-    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('version')) fail('No Plugin Version');
-    if (plugin && !plugin.hasOwnProperty('commands')) fail('No Plugin Commands');
+    if (plugin && !plugin.hasOwnProperty('meta')) {
+      fail('No Plugin Metadata');
+    }
+    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('name')) {
+      fail('No Plugin Name');
+    }
+    if (plugin && plugin.hasOwnProperty('meta') && !plugin.meta.hasOwnProperty('version')) {
+      fail('No Plugin Version');
+    }
+    if (plugin && !plugin.hasOwnProperty('commands')) {
+      fail('No Plugin Commands');
+    }
     if (!failed) {
       pluginName = plugin.meta.name + ' ' + plugin.meta.version;
       try {
@@ -390,15 +406,33 @@ function run() {
     server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {cwd: 'server'});
     server.on('close', () => {
       if (config.saveServerData) {
-        if (!fs.existsSync('default')) fs.mkdirSync('default');
-        if (fs.existsSync('server/whitelist.json')) fs.copyFileSync('server/whitelist.json', 'default/whitelist.json');
-        if (fs.existsSync('server/white-list.txt')) fs.copyFileSync('server/white-list.txt', 'default/white-list.txt');
-        if (fs.existsSync('server/ops.json')) fs.copyFileSync('server/ops.json', 'default/ops.json');
-        if (fs.existsSync('server/ops.txt')) fs.copyFileSync('server/ops.txt', 'default/ops.txt');
-        if (fs.existsSync('server/banned-players.json')) fs.copyFileSync('server/banned-players.json', 'default/banned-players.json');
-        if (fs.existsSync('server/banned-players.txt')) fs.copyFileSync('server/banned-players.txt', 'default/banned-players.txt');
-        if (fs.existsSync('server/banned-ips.json')) fs.copyFileSync('server/banned-ips.json', 'default/banned-ips.json');
-        if (fs.existsSync('server/banned-ips.txt')) fs.copyFileSync('server/banned-ips.txt', 'default/banned-ips.txt');
+        if (!fs.existsSync('default')) {
+          fs.mkdirSync('default');
+        }
+        if (fs.existsSync('server/whitelist.json')) {
+          fs.copyFileSync('server/whitelist.json', 'default/whitelist.json');
+        }
+        if (fs.existsSync('server/white-list.txt')) {
+          fs.copyFileSync('server/white-list.txt', 'default/white-list.txt');
+        }
+        if (fs.existsSync('server/ops.json')) {
+          fs.copyFileSync('server/ops.json', 'default/ops.json');
+        }
+        if (fs.existsSync('server/ops.txt')) {
+          fs.copyFileSync('server/ops.txt', 'default/ops.txt');
+        }
+        if (fs.existsSync('server/banned-players.json')) {
+          fs.copyFileSync('server/banned-players.json', 'default/banned-players.json');
+        }
+        if (fs.existsSync('server/banned-players.txt')) {
+          fs.copyFileSync('server/banned-players.txt', 'default/banned-players.txt');
+        }
+        if (fs.existsSync('server/banned-ips.json')) {
+          fs.copyFileSync('server/banned-ips.json', 'default/banned-ips.json');
+        }
+        if (fs.existsSync('server/banned-ips.txt')) {
+          fs.copyFileSync('server/banned-ips.txt', 'default/banned-ips.txt');
+        }
       }
       server = null;
     });
@@ -444,11 +478,15 @@ if (process.argv.indexOf('--headless') === -1) {
     if (fs.existsSync('jars/manifest.json')) {
       var customVersions = require('jars/manifest');
       for (x in customVersions) {
-        if (fs.existsSync('jars/' + customVersions[x])) versions.push([x, 'custom?' + customVersions[x]]);
+        if (fs.existsSync('jars/' + customVersions[x])) {
+          versions.push([x, 'custom?' + customVersions[x]]);
+        }
       }
     }
     for (i = 0; i < versionsJson.versions.length; i++) {
-      if (!cache.noServer[versionsJson.versions[i].id]) versions.push([versionsJson.versions[i].id, versionsJson.versions[i].id]);
+      if (!cache.noServer[versionsJson.versions[i].id]) {
+        versions.push([versionsJson.versions[i].id, versionsJson.versions[i].id]);
+      }
     }
     var file = fs.readFileSync('options.html', {encoding: 'utf8'});
     file = file.replace(new RegExp('CONFIG_JSON', 'g'), JSON.stringify(config));
@@ -461,13 +499,17 @@ if (process.argv.indexOf('--headless') === -1) {
       server.stdin.write('stop\n', 'utf8');
       server.on('close', () => {
         config = req.body.config;
-        if (req.body.deleteWorld) rimraf.sync('worldDir');
+        if (req.body.deleteWorld) {
+          rimraf.sync('worldDir');
+        }
         save();
         run();
       });
     } else {
       config = req.body.config;
-      if (req.body.deleteWorld) rimraf.sync('world');
+      if (req.body.deleteWorld) {
+        rimraf.sync('world');
+      }
       save();
       run();
     }
