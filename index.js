@@ -229,7 +229,7 @@ function loadPlugins(playerOutput) {
       }
     }
 
-    var success () => {
+    var success = () => {
       if (playerOutput) {
         server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
           text: 'Successfully Loaded Plugin ' + pluginName,
