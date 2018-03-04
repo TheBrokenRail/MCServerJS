@@ -206,7 +206,7 @@ function loadPlugins(playerOutput) {
     var failed = false;
     var pluginName = files[i];
 
-    function fail(message) {
+    var fail = message => {
       failed = true;
       if (message !== 'Plugin Disabled') {
         if (playerOutput) {
@@ -229,7 +229,7 @@ function loadPlugins(playerOutput) {
       }
     }
 
-    function success() {
+    var success () => {
       if (playerOutput) {
         server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
           text: 'Successfully Loaded Plugin ' + pluginName,
@@ -266,7 +266,7 @@ function loadPlugins(playerOutput) {
     if (!failed) {
       pluginName = plugin.meta.name + ' ' + plugin.meta.version;
       try {
-        plugin.init(exec, function(str) {
+        plugin.init(exec, (str) => {
           log = log + plugin.meta.name + ': ' + str + '\n';
           console.log(plugin.meta.name + ': ' + str);
         });
@@ -285,7 +285,9 @@ function loadPlugins(playerOutput) {
         if (version.startsWith('custom?')) {
           var customVersions = require('jars/manifest');
           for (x in customVersions) {
-            if (version === 'custom?' + customVersions[x]) version = x;
+            if (version === 'custom?' + customVersions[x]) {
+              version = x;
+            }
           }
         }
         if (version === 'latest-release') {
@@ -478,7 +480,9 @@ function run() {
     server.stdout.on('data', chunk => {
       log = log + chunk.toString();
       process.stdout.write(chunk.toString());
-      if (pluginsEnabled) runCommand(chunk.toString(), server.stdin, commands);
+      if (pluginsEnabled) {
+        runCommand(chunk.toString(), server.stdin, commands);
+      }
     });
     server.stderr.on('data', chunk => {
       log = log + chunk.toString();
