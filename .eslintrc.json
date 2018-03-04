@@ -33,6 +33,7 @@
     "eol-last": [
       "error",
       "always"
-    ]
+    ],
+    "no-control-regex": "off"
   }
 }
