@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js"
+    "run": "node index.js",
+    "lint": "eslint ."
   },
   "author": "TheBrokenRail",
   "repository": "TheBrokenRail/MCServerJS",
