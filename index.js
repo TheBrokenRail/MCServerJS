@@ -1,16 +1,20 @@
 const fs = require('fs-extra');
 const rimraf = require('rimraf');
 const request = require('sync-request');
-const { spawn } = require('child_process');
+const {
+  spawn
+} = require('child_process');
 const express = require('express');
 const session = require('express-session');
 const LevelStore = require('express-session-level')(session);
 const db = require('level')('./sessions');
 const app = express();
-  
+
 if (process.argv.indexOf('--headless') === -1) {
   app.use(express.json());
-  app.use(express.urlencoded({extended: true}));
+  app.use(express.urlencoded({
+    extended: true
+  }));
   app.use(session({
     name: 'node-js-server-cookie',
     secret: 'NodeJs Minecraft Server',
@@ -51,6 +55,7 @@ const defaultConfig = {
   pluginsEnabled: true
 };
 var config = null;
+
 function load() {
   config = null;
   if (fs.existsSync('config.json')) {
@@ -61,10 +66,12 @@ function load() {
     save();
   }
 }
+
 function save() {
   fs.writeFileSync('config.json', JSON.stringify(config));
 }
 load();
+
 function serverProperties() {
   return `level-name=../worldDir/world
 server-port=${config.port}
@@ -76,6 +83,7 @@ max-players=${config.maxPlayers}
 motd=${config.motd}`;
 }
 var pluginsEnabled = config.pluginsEnabled;
+
 function build() {
   pluginsEnabled = config.pluginsEnabled;
   rimraf.sync('server');
@@ -93,7 +101,9 @@ function build() {
     var url = '';
     var pluginMinimum = null;
     for (i = 0; i < versionsJson.versions.length; i++) {
-      if ('1.7.2' === versionsJson.versions[i].id) pluginMinimum = new Date(versionsJson.versions[i].releaseTime);
+      if ('1.7.2' === versionsJson.versions[i].id) {
+        pluginMinimum = new Date(versionsJson.versions[i].releaseTime);
+      }
     }
     for (i = 0; i < versionsJson.versions.length; i++) {
       if (version === versionsJson.versions[i].id) {
@@ -121,7 +131,9 @@ function build() {
       for (x in customVersions) {
         if ('custom?' + customVersions[x] === config.version && fs.existsSync('jars/' + customVersions[x])) {
           fs.copyFileSync('jars/' + customVersions[x], 'server/server.jar');
-          if (fs.existsSync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/')) fs.copySync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/', 'server/');
+          if (fs.existsSync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/')) {
+            fs.copySync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/', 'server/');
+          }
         } else if ('custom?' + customVersions[x] === config.version) {
           log = log + 'Custom Version Not Found, Please Select Another Version\n';
           return false;
@@ -129,8 +141,12 @@ function build() {
       }
     }
   }
-  if (fs.existsSync('default/')) fs.copySync('default/', 'server/');
-  if (!fs.existsSync('worldDir')) fs.mkdirSync('worldDir');
+  if (fs.existsSync('default/')) {
+    fs.copySync('default/', 'server/');
+  }
+  if (!fs.existsSync('worldDir')) {
+    fs.mkdirSync('worldDir');
+  }
   fs.writeFileSync('server/eula.txt', 'eula=true');
   fs.writeFileSync('server/server.properties', serverProperties());
   return true;
@@ -140,6 +156,7 @@ var log = '';
 var commands = {};
 var plugins = [];
 var killPlugin = [];
+
 function loadPlugins(playerOutput) {
   commands = {};
   for (i = 0; i < killPlugin.length; i++) {
@@ -170,7 +187,9 @@ function loadPlugins(playerOutput) {
         var listener = chunk => {
           var strChunk = chunk.toString().replace(new RegExp('\r', 'g'), '').split('\n');
           for (i = 0; i < strChunk.length; i++) {
-            if (strChunk[i].split(']: ').length > 1) strChunk[i] = strChunk[i].split(']: ').slice(1).join(']: ');
+            if (strChunk[i].split(']: ').length > 1) {
+              strChunk[i] = strChunk[i].split(']: ').slice(1).join(']: ');
+            }
           }
           str = str + strChunk.join('\n');
         };
@@ -186,6 +205,7 @@ function loadPlugins(playerOutput) {
     var plugin = null;
     var failed = false;
     var pluginName = files[i];
+
     function fail(message) {
       failed = true;
       if (message !== 'Plugin Disabled') {
@@ -208,6 +228,7 @@ function loadPlugins(playerOutput) {
         console.log('Skipping Plugin ' + pluginName + ': ' + message);
       }
     }
+
     function success() {
       if (playerOutput) {
         server.stdin.write('tellraw ' + playerOutput + ' ' + JSON.stringify({
@@ -221,9 +242,13 @@ function loadPlugins(playerOutput) {
     try {
       delete require.cache[require.resolve('./plugins/' + files[i])];
       plugin = require('./plugins/' + files[i]);
-      if (plugin.hasOwnProperty('disabled') && plugin.disabled) throw 'Plugin Disabled';
-      if (plugin.hasOwnProperty('kill')) killPlugin.push(plugin.kill);
-    } catch(e) {
+      if (plugin.hasOwnProperty('disabled') && plugin.disabled) {
+        throw 'Plugin Disabled';
+      }
+      if (plugin.hasOwnProperty('kill')) {
+        killPlugin.push(plugin.kill);
+      }
+    } catch (e) {
       fail(e.toString());
     }
     if (plugin && !plugin.hasOwnProperty('meta')) {
@@ -241,11 +266,11 @@ function loadPlugins(playerOutput) {
     if (!failed) {
       pluginName = plugin.meta.name + ' ' + plugin.meta.version;
       try {
-        plugin.init(exec, function (str) {
+        plugin.init(exec, function(str) {
           log = log + plugin.meta.name + ': ' + str + '\n';
           console.log(plugin.meta.name + ': ' + str);
         });
-      } catch(e) {
+      } catch (e) {
         fail(e.toString());
       }
       Object.assign(commands, plugin.commands);
@@ -253,7 +278,7 @@ function loadPlugins(playerOutput) {
       plugins.push(plugin.meta);
     }
   }
-  commands.serverjs = function (data) {
+  commands.serverjs = function(data) {
     switch (data.args[0]) {
       case 'version':
         var version = data.version;
@@ -263,8 +288,12 @@ function loadPlugins(playerOutput) {
             if (version === 'custom?' + customVersions[x]) version = x;
           }
         }
-        if (version === 'latest-release') version = 'Latest Release';
-        if (version === 'latest-snapshot') version = 'Latest Snapshot';
+        if (version === 'latest-release') {
+          version = 'Latest Release';
+        }
+        if (version === 'latest-snapshot') {
+          version = 'Latest Snapshot';
+        }
         exec('tellraw ' + data.player + ' ' + JSON.stringify({
           text: 'NodeJS: ' + process.version + '\nMinecraft: ' + version,
           color: 'yellow'
@@ -273,7 +302,7 @@ function loadPlugins(playerOutput) {
       case 'plugins':
         switch (data.args[1]) {
           case 'list':
-            var text = '';
+            let text = '';
             for (k = 0; k < plugins.length; k++) {
               text = text + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
@@ -295,7 +324,7 @@ function loadPlugins(playerOutput) {
             loadPlugins(data.player);
             break;
           case 'commands':
-            var text = '';
+            let text = '';
             for (x in commands) {
               var done = false;
               for (k = 0; k < plugins.length; k++) {
@@ -361,8 +390,11 @@ function loadPlugins(playerOutput) {
     }
   };
 }
+
 function runCommand(str, stdin, commands) {
-  if (str.split(']: ').length > 1) str = str.split(']: ').slice(1).join(']: ');
+  if (str.split(']: ').length > 1) {
+    str = str.split(']: ').slice(1).join(']: ');
+  }
   if (str.startsWith('<')) {
     for (x in commands) {
       var cmdArr = str.split('<');
@@ -372,7 +404,11 @@ function runCommand(str, stdin, commands) {
         if (cmd.startsWith(' ' + x)) {
           var args = cmd.split(' ' + x)[1].trim().split(' ');
           try {
-            commands[x]({player: player, args: args, version: config.version});
+            commands[x]({
+              player: player,
+              args: args,
+              version: config.version
+            });
           } catch (e) {
             stdin.write('tellraw ' + player + ' ' + JSON.stringify({
               text: e.toString(),
@@ -386,6 +422,7 @@ function runCommand(str, stdin, commands) {
     }
   }
 }
+
 function run() {
   if (server) {
     server.kill();
@@ -403,7 +440,9 @@ function run() {
     }
   }
   if (success) {
-    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {cwd: 'server'});
+    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {
+      cwd: 'server'
+    });
     server.on('close', () => {
       if (config.saveServerData) {
         if (!fs.existsSync('default')) {
@@ -449,6 +488,7 @@ function run() {
 }
 run();
 var cache = {};
+
 function loadCache() {
   cache = {};
   cache.noServer = {};
@@ -488,7 +528,9 @@ if (process.argv.indexOf('--headless') === -1) {
         versions.push([versionsJson.versions[i].id, versionsJson.versions[i].id]);
       }
     }
-    var file = fs.readFileSync('options.html', {encoding: 'utf8'});
+    var file = fs.readFileSync('options.html', {
+      encoding: 'utf8'
+    });
     file = file.replace(new RegExp('CONFIG_JSON', 'g'), JSON.stringify(config));
     file = file.replace(new RegExp('VERSIONS_JSON', 'g'), JSON.stringify(versions));
     res.send(file);
@@ -541,16 +583,16 @@ if (process.argv.indexOf('--headless') === -1) {
   });
   app.listen(80, () => console.log('Server UI listening on port 80!'));
 }
-if (process.platform === "win32") {
-  var readline = require("readline").createInterface({
+if (process.platform === 'win32') {
+  var readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  readline.on("SIGINT", () => {
-    process.emit("SIGINT");
+  readline.on('SIGINT', () => {
+    process.emit('SIGINT');
   });
 }
-process.on('SIGINT', function () {
+process.on('SIGINT', function() {
   if (server) {
     server.stdin.write('stop\n', 'utf8');
     server.on('close', () => {
