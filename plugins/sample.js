@@ -17,6 +17,9 @@ module.exports = {
       exec('tp ' + data.player + ' ~ ~ ~', (str) => {
         exec('tellraw ' + data.player + ' ' + JSON.stringify({text: str}));
       });
+    },
+    log: (data) => {
+      log(data.args.join(' '));
     }
   },
   meta: {
