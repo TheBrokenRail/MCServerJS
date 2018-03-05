@@ -38,6 +38,10 @@ module.exports = {
       getCords: {
         args: [],
         description: 'Returns Player Cordinates'
+      },
+      log: {
+        args: ['Text'],
+        description: 'Prints Text To Server Log'
       }
     }
   }
