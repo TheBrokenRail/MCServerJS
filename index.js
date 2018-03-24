@@ -74,7 +74,6 @@ function load() {
 function save() {
   fs.writeFileSync('data/config.json', JSON.stringify(config));
 }
-load();
 
 function serverProperties() {
   return `level-name=../worldDir/world
@@ -89,6 +88,7 @@ motd=${config.motd}`;
 var pluginsEnabled = config.pluginsEnabled;
 
 function build() {
+  loadCache();
   pluginsEnabled = config.pluginsEnabled;
   rimraf.sync('data/server');
   fs.mkdirSync('data/server');
@@ -314,8 +314,7 @@ function loadPlugins(playerOutput) {
             for (k = 0; k < plugins.length; k++) {
               pluginList = pluginList + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([
-              {
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'Listing All Plugins:\n',
                 color: 'yellow'
               },
@@ -350,8 +349,7 @@ function loadPlugins(playerOutput) {
                 commandList = commandList + x + ': No Description\n';
               }
             }
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([
-              {
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'Listing All Commands:\n',
                 color: 'yellow'
               },
@@ -362,8 +360,7 @@ function loadPlugins(playerOutput) {
             ]));
             break;
           case 'help':
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([
-              {
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
                 text: 'USAGE:\n',
                 color: 'yellow'
               },
@@ -382,8 +379,7 @@ function loadPlugins(playerOutput) {
         }
         break;
       case 'help':
-        exec('tellraw ' + data.player + ' ' + JSON.stringify([
-          {
+        exec('tellraw ' + data.player + ' ' + JSON.stringify([{
             text: 'USAGE:\n',
             color: 'yellow'
           },
@@ -504,7 +500,7 @@ function run() {
     });
   }
 }
-run();
+
 var cache = {};
 
 function loadCache() {
@@ -525,7 +521,10 @@ function loadCache() {
     cache = require('./data/cache.json');
   }
 }
-loadCache();
+
+load();
+run();
+
 if (process.argv.indexOf('--headless') === -1) {
   app.get('/', (req, res) => {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
