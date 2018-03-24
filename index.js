@@ -452,7 +452,7 @@ function run() {
     }
   }
   if (success) {
-    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'data/server.jar', 'nogui'], {
+    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {
       cwd: 'data/server'
     });
     server.on('close', () => {
@@ -485,6 +485,7 @@ function run() {
           fs.copyFileSync('data/server/banned-ips.txt', 'data/default/banned-ips.txt');
         }
       }
+      rimraf.sync('data/server');
       server = null;
     });
     server.stdout.on('data', chunk => {
