@@ -125,6 +125,7 @@ function build() {
     var versionJson = JSON.parse(jarRes.getBody());
     if (!versionJson.downloads.hasOwnProperty('data/server')) {
       log = log + 'Version Does Not have A Server Download, Please Select Another Version\n';
+      console.log('Version Does Not have A Server Download, Please Select Another Version');
       return false;
     }
     var jar = request('GET', versionJson.downloads.server.url);
@@ -140,6 +141,7 @@ function build() {
           }
         } else if ('custom?' + customVersions[x] === config.version) {
           log = log + 'Custom Version Not Found, Please Select Another Version\n';
+          console.log('Custom Version Not Found, Please Select Another Version');
           return false;
         }
       }
