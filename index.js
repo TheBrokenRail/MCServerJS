@@ -243,8 +243,8 @@ function loadPlugins(playerOutput) {
       console.log('Successfully Loaded Plugin ' + pluginName);
     };
     try {
-      delete require.cache[require.resolve('data/plugins/' + files[i])];
-      plugin = require('data/plugins/' + files[i]);
+      delete require.cache[require.resolve('plugins/' + files[i])];
+      plugin = require('plugins/' + files[i]);
       if (plugin.hasOwnProperty('disabled') && plugin.disabled) {
         throw 'Plugin Disabled';
       }
