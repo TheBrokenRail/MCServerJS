@@ -7,7 +7,7 @@ const {
 const express = require('express');
 const session = require('express-session');
 const LevelStore = require('express-session-level')(session);
-const db = require('level')('datasessions');
+const db = require('level')('./sessions');
 const app = express();
 
 if (process.argv.indexOf('--headless') === -1) {
