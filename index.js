@@ -314,7 +314,8 @@ function loadPlugins(playerOutput) {
             for (k = 0; k < plugins.length; k++) {
               pluginList = pluginList + plugins[k].name + ' ' + plugins[k].version + ': ' + plugins[k].description + '\n';
             }
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([
+              {
                 text: 'Listing All Plugins:\n',
                 color: 'yellow'
               },
@@ -349,7 +350,8 @@ function loadPlugins(playerOutput) {
                 commandList = commandList + x + ': No Description\n';
               }
             }
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([
+              {
                 text: 'Listing All Commands:\n',
                 color: 'yellow'
               },
@@ -360,7 +362,8 @@ function loadPlugins(playerOutput) {
             ]));
             break;
           case 'help':
-            exec('tellraw ' + data.player + ' ' + JSON.stringify([{
+            exec('tellraw ' + data.player + ' ' + JSON.stringify([
+              {
                 text: 'USAGE:\n',
                 color: 'yellow'
               },
@@ -379,7 +382,8 @@ function loadPlugins(playerOutput) {
         }
         break;
       case 'help':
-        exec('tellraw ' + data.player + ' ' + JSON.stringify([{
+        exec('tellraw ' + data.player + ' ' + JSON.stringify([
+          {
             text: 'USAGE:\n',
             color: 'yellow'
           },
