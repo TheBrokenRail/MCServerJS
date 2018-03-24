@@ -10,6 +10,9 @@ const LevelStore = require('express-session-level')(session);
 const db = require('level')('./sessions');
 const app = express();
 
+if (!fs.existsSync('data')) {
+  fs.mkdirSync('data');
+}
 if (process.argv.indexOf('--headless') === -1) {
   app.use(express.json());
   app.use(express.urlencoded({
