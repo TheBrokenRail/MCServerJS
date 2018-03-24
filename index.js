@@ -520,7 +520,7 @@ function loadCache() {
     }
     fs.writeFileSync('data/cache.json', JSON.stringify(cache));
   } else {
-    cache = JSON.parse(fs.readFileSync('data/cache.json', 'utf8'));
+    cache = require('./data/cache.json');
   }
 }
 loadCache();
