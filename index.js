@@ -7,7 +7,7 @@ const {
 const express = require('express');
 const session = require('express-session');
 const LevelStore = require('express-session-level')(session);
-const db = require('level')('./sessions');
+const db = require('level')('datasessions');
 const app = express();
 
 if (process.argv.indexOf('--headless') === -1) {
@@ -58,8 +58,8 @@ var config = null;
 
 function load() {
   config = null;
-  if (fs.existsSync('config.json')) {
-    config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  if (fs.existsSync('data/config.json')) {
+    config = JSON.parse(fs.readFileSync('data/config.json', 'utf8'));
   }
   if (!config) {
     config = defaultConfig;
@@ -68,7 +68,7 @@ function load() {
 }
 
 function save() {
-  fs.writeFileSync('config.json', JSON.stringify(config));
+  fs.writeFileSync('data/config.json', JSON.stringify(config));
 }
 load();
 
@@ -86,8 +86,8 @@ var pluginsEnabled = config.pluginsEnabled;
 
 function build() {
   pluginsEnabled = config.pluginsEnabled;
-  rimraf.sync('server');
-  fs.mkdirSync('server');
+  rimraf.sync('data/server');
+  fs.mkdirSync('data/server');
   if (!config.version.startsWith('custom?')) {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
     var versionsJson = JSON.parse(versionsRes.getBody());
@@ -119,20 +119,20 @@ function build() {
     }
     var jarRes = request('GET', url);
     var versionJson = JSON.parse(jarRes.getBody());
-    if (!versionJson.downloads.hasOwnProperty('server')) {
+    if (!versionJson.downloads.hasOwnProperty('data/server')) {
       log = log + 'Version Does Not have A Server Download, Please Select Another Version\n';
       return false;
     }
     var jar = request('GET', versionJson.downloads.server.url);
-    fs.writeFileSync('server/server.jar', jar.getBody());
+    fs.writeFileSync('data/server/server.jar', jar.getBody());
   } else {
     if (fs.existsSync('jars/manifest.json')) {
       var customVersions = require('jars/manifest');
       for (x in customVersions) {
         if ('custom?' + customVersions[x] === config.version && fs.existsSync('jars/' + customVersions[x])) {
-          fs.copyFileSync('jars/' + customVersions[x], 'server/server.jar');
+          fs.copyFileSync('jars/' + customVersions[x], 'data/server/server.jar');
           if (fs.existsSync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/')) {
-            fs.copySync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/', 'server/');
+            fs.copySync('jars/' + customVersions[x].substring(0, customVersions[x].lastIndexOf('.')) + '/', 'data/server/');
           }
         } else if ('custom?' + customVersions[x] === config.version) {
           log = log + 'Custom Version Not Found, Please Select Another Version\n';
@@ -141,14 +141,14 @@ function build() {
       }
     }
   }
-  if (fs.existsSync('default/')) {
-    fs.copySync('default/', 'server/');
+  if (fs.existsSync('data/default')) {
+    fs.copySync('data/default/', 'data/server/');
   }
-  if (!fs.existsSync('worldDir')) {
-    fs.mkdirSync('worldDir');
+  if (!fs.existsSync('data/worldDir')) {
+    fs.mkdirSync('data/worldDir');
   }
-  fs.writeFileSync('server/eula.txt', 'eula=true');
-  fs.writeFileSync('server/server.properties', serverProperties());
+  fs.writeFileSync('data/server/eula.txt', 'eula=true');
+  fs.writeFileSync('data/server/server.properties', serverProperties());
   return true;
 }
 var server = null;
@@ -165,7 +165,7 @@ function loadPlugins(playerOutput) {
     killPlugin.splice(i, 1);
   }
   plugins = [{
-    name: 'ServerJS Built-In',
+    name: 'data/serverJS Built-In',
     version: '1.0.0',
     description: 'Contains Built In ServerJS Command',
     commands: {
@@ -240,8 +240,8 @@ function loadPlugins(playerOutput) {
       console.log('Successfully Loaded Plugin ' + pluginName);
     };
     try {
-      delete require.cache[require.resolve('./plugins/' + files[i])];
-      plugin = require('./plugins/' + files[i]);
+      delete require.cache[require.resolve('dataplugins/' + files[i])];
+      plugin = require('dataplugins/' + files[i]);
       if (plugin.hasOwnProperty('disabled') && plugin.disabled) {
         throw 'Plugin Disabled';
       }
@@ -362,7 +362,7 @@ function loadPlugins(playerOutput) {
                 color: 'yellow'
               },
               {
-                text: 'serverjs plugins <list|reload|commands|help>',
+                text: 'data/serverjs plugins <list|reload|commands|help>',
                 color: 'gold'
               }
             ]));
@@ -382,7 +382,7 @@ function loadPlugins(playerOutput) {
             color: 'yellow'
           },
           {
-            text: 'serverjs <version|plugins|help>',
+            text: 'data/serverjs <version|plugins|help>',
             color: 'gold'
           }
         ]));
@@ -446,37 +446,37 @@ function run() {
     }
   }
   if (success) {
-    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'server.jar', 'nogui'], {
-      cwd: 'server'
+    server = spawn('java', ['-Xmx' + (config.ram * 1024) + 'M', '-Xms' + (config.ram * 1024) + 'M', '-jar', 'data/server.jar', 'nogui'], {
+      cwd: 'data/server'
     });
     server.on('close', () => {
       if (config.saveServerData) {
-        if (!fs.existsSync('default')) {
-          fs.mkdirSync('default');
+        if (!fs.existsSync('data/default')) {
+          fs.mkdirSync('data/default');
         }
-        if (fs.existsSync('server/whitelist.json')) {
-          fs.copyFileSync('server/whitelist.json', 'default/whitelist.json');
+        if (fs.existsSync('data/server/whitelist.json')) {
+          fs.copyFileSync('data/server/whitelist.json', 'data/default/whitelist.json');
         }
-        if (fs.existsSync('server/white-list.txt')) {
-          fs.copyFileSync('server/white-list.txt', 'default/white-list.txt');
+        if (fs.existsSync('data/server/white-list.txt')) {
+          fs.copyFileSync('data/server/white-list.txt', 'data/default/white-list.txt');
         }
-        if (fs.existsSync('server/ops.json')) {
-          fs.copyFileSync('server/ops.json', 'default/ops.json');
+        if (fs.existsSync('data/server/ops.json')) {
+          fs.copyFileSync('data/server/ops.json', 'data/default/ops.json');
         }
-        if (fs.existsSync('server/ops.txt')) {
-          fs.copyFileSync('server/ops.txt', 'default/ops.txt');
+        if (fs.existsSync('data/server/ops.txt')) {
+          fs.copyFileSync('data/server/ops.txt', 'data/default/ops.txt');
         }
-        if (fs.existsSync('server/banned-players.json')) {
-          fs.copyFileSync('server/banned-players.json', 'default/banned-players.json');
+        if (fs.existsSync('data/server/banned-players.json')) {
+          fs.copyFileSync('data/server/banned-players.json', 'data/default/banned-players.json');
         }
-        if (fs.existsSync('server/banned-players.txt')) {
-          fs.copyFileSync('server/banned-players.txt', 'default/banned-players.txt');
+        if (fs.existsSync('data/server/banned-players.txt')) {
+          fs.copyFileSync('data/server/banned-players.txt', 'data/default/banned-players.txt');
         }
-        if (fs.existsSync('server/banned-ips.json')) {
-          fs.copyFileSync('server/banned-ips.json', 'default/banned-ips.json');
+        if (fs.existsSync('data/server/banned-ips.json')) {
+          fs.copyFileSync('data/server/banned-ips.json', 'data/default/banned-ips.json');
         }
-        if (fs.existsSync('server/banned-ips.txt')) {
-          fs.copyFileSync('server/banned-ips.txt', 'default/banned-ips.txt');
+        if (fs.existsSync('data/server/banned-ips.txt')) {
+          fs.copyFileSync('data/server/banned-ips.txt', 'data/default/banned-ips.txt');
         }
       }
       server = null;
@@ -506,7 +506,7 @@ function loadCache() {
     for (i = 0; i < versionsJson.versions.length; i++) {
       var versionRes = request('GET', versionsJson.versions[i].url);
       var versionJson = JSON.parse(versionRes.getBody());
-      if (!versionJson.downloads.hasOwnProperty('server')) {
+      if (!versionJson.downloads.hasOwnProperty('data/server')) {
         cache.noServer[versionsJson.versions[i].id] = true;
       }
     }
@@ -550,7 +550,7 @@ if (process.argv.indexOf('--headless') === -1) {
       server.on('close', () => {
         config = req.body.config;
         if (req.body.deleteWorld) {
-          rimraf.sync('worldDir');
+          rimraf.sync('data/worldDir');
         }
         save();
         run();
@@ -589,7 +589,7 @@ if (process.argv.indexOf('--headless') === -1) {
   app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/login.html');
   });
-  app.listen(80, () => console.log('Server UI listening on port 80!'));
+  app.listen(80, () => console.log('data/server UI listening on port 80!'));
 }
 if (process.platform === 'win32') {
   var readline = require('readline').createInterface({
