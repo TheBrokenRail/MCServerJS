@@ -123,7 +123,7 @@ function build() {
     }
     var jarRes = request('GET', url);
     var versionJson = JSON.parse(jarRes.getBody());
-    if (!versionJson.downloads.hasOwnProperty('data/server')) {
+    if (!versionJson.downloads.hasOwnProperty('server')) {
       log = log + 'Version Does Not have A Server Download, Please Select Another Version\n';
       console.log('Version Does Not have A Server Download, Please Select Another Version');
       return false;
