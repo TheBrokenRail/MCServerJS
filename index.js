@@ -243,8 +243,8 @@ function loadPlugins(playerOutput) {
       console.log('Successfully Loaded Plugin ' + pluginName);
     };
     try {
-      delete require.cache[require.resolve('dataplugins/' + files[i])];
-      plugin = require('dataplugins/' + files[i]);
+      delete require.cache[require.resolve('data/plugins/' + files[i])];
+      plugin = require('data/plugins/' + files[i]);
       if (plugin.hasOwnProperty('disabled') && plugin.disabled) {
         throw 'Plugin Disabled';
       }
@@ -507,7 +507,7 @@ var cache = {};
 function loadCache() {
   cache = {};
   cache.noServer = {};
-  if (!fs.existsSync('cache.json') || (fs.existsSync('cache.json') && (fs.statSync('cache.json').mtime.getTime() + 172800000) < (new Date()).getTime())) {
+  if (!fs.existsSync('data/cache.json') || (fs.existsSync('data/cache.json') && (fs.statSync('data/cache.json').mtime.getTime() + 172800000) < (new Date()).getTime())) {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
     var versionsJson = JSON.parse(versionsRes.getBody());
     for (i = 0; i < versionsJson.versions.length; i++) {
@@ -517,9 +517,9 @@ function loadCache() {
         cache.noServer[versionsJson.versions[i].id] = true;
       }
     }
-    fs.writeFileSync('cache.json', JSON.stringify(cache));
+    fs.writeFileSync('data/cache.json', JSON.stringify(cache));
   } else {
-    cache = JSON.parse(fs.readFileSync('cache.json', 'utf8'));
+    cache = JSON.parse(fs.readFileSync('data/cache.json', 'utf8'));
   }
 }
 loadCache();
