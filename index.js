@@ -398,9 +398,13 @@ function loadPlugins(playerOutput) {
 }
 
 function runCommand(str, stdin, commands) {
-  if (str.split(']: ').length > 1) {
-    str = str.split(']: ').slice(1).join(']: ');
+  var strChunk = str.toString().replace(new RegExp('\r', 'g'), '').split('\n');
+  for (i = 0; i < strChunk.length; i++) {
+    if (strChunk[i].split(']: ').length > 1) {
+      strChunk[i] = strChunk[i].split(']: ').slice(1).join(']: ');
+    }
   }
+  str = str + strChunk.join('\n');
   if (str.startsWith('<')) {
     for (x in commands) {
       var cmdArr = str.split('<');
