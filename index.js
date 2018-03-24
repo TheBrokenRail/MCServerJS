@@ -85,7 +85,7 @@ gamemode=${config.gamemode}
 max-players=${config.maxPlayers}
 motd=${config.motd}`;
 }
-var pluginsEnabled = config.pluginsEnabled;
+var pluginsEnabled = null;
 
 function build() {
   loadCache();
