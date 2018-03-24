@@ -7,13 +7,13 @@ const {
 const express = require('express');
 const session = require('express-session');
 const LevelStore = require('express-session-level')(session);
-const db = require('level')('./sessions');
-const readline = require('readline');
-const app = express();
-
 if (!fs.existsSync('data')) {
   fs.mkdirSync('data');
 }
+const db = require('level')('./data/sessions');
+const readline = require('readline');
+const app = express();
+
 if (process.argv.indexOf('--headless') === -1) {
   app.use(express.json());
   app.use(express.urlencoded({
@@ -92,6 +92,7 @@ function build() {
   pluginsEnabled = config.pluginsEnabled;
   rimraf.sync('data/server');
   fs.mkdirSync('data/server');
+  console.log(config);
   if (!config.version.startsWith('custom?')) {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
     var versionsJson = JSON.parse(versionsRes.getBody());
@@ -597,7 +598,7 @@ if (process.argv.indexOf('--headless') === -1) {
   app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/login.html');
   });
-  app.listen(80, () => console.log('data/server UI listening on port 80!'));
+  app.listen(80, () => console.log('Server UI listening on port 80!'));
 }
 if (process.platform === 'win32') {
   var readlineInterface = readline.createInterface({
