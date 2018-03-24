@@ -92,7 +92,6 @@ function build() {
   pluginsEnabled = config.pluginsEnabled;
   rimraf.sync('data/server');
   fs.mkdirSync('data/server');
-  console.log(config);
   if (!config.version.startsWith('custom?')) {
     var versionsRes = request('GET', 'https://launchermeta.mojang.com/mc/game/version_manifest.json');
     var versionsJson = JSON.parse(versionsRes.getBody());
@@ -515,7 +514,7 @@ function loadCache() {
     for (i = 0; i < versionsJson.versions.length; i++) {
       var versionRes = request('GET', versionsJson.versions[i].url);
       var versionJson = JSON.parse(versionRes.getBody());
-      if (!versionJson.downloads.hasOwnProperty('data/server')) {
+      if (!versionJson.downloads.hasOwnProperty('server')) {
         cache.noServer[versionsJson.versions[i].id] = true;
       }
     }
