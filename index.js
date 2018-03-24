@@ -8,6 +8,7 @@ const express = require('express');
 const session = require('express-session');
 const LevelStore = require('express-session-level')(session);
 const db = require('level')('./sessions');
+const readline = require('readline');
 const app = express();
 
 if (!fs.existsSync('data')) {
@@ -130,7 +131,7 @@ function build() {
     fs.writeFileSync('data/server/server.jar', jar.getBody());
   } else {
     if (fs.existsSync('jars/manifest.json')) {
-      var customVersions = require('jars/manifest');
+      var customVersions = require('./jars/manifest');
       for (x in customVersions) {
         if ('custom?' + customVersions[x] === config.version && fs.existsSync('jars/' + customVersions[x])) {
           fs.copyFileSync('jars/' + customVersions[x], 'data/server/server.jar');
@@ -243,8 +244,8 @@ function loadPlugins(playerOutput) {
       console.log('Successfully Loaded Plugin ' + pluginName);
     };
     try {
-      delete require.cache[require.resolve('plugins/' + files[i])];
-      plugin = require('plugins/' + files[i]);
+      delete require.cache[require.resolve('./plugins/' + files[i])];
+      plugin = require('./plugins/' + files[i]);
       if (plugin.hasOwnProperty('disabled') && plugin.disabled) {
         throw 'Plugin Disabled';
       }
@@ -286,7 +287,7 @@ function loadPlugins(playerOutput) {
       case 'version':
         var version = data.version;
         if (version.startsWith('custom?')) {
-          var customVersions = require('jars/manifest');
+          var customVersions = require('./jars/manifest');
           for (x in customVersions) {
             if (version === 'custom?' + customVersions[x]) {
               version = x;
@@ -531,7 +532,7 @@ if (process.argv.indexOf('--headless') === -1) {
     versions.push(['Latest Release', 'latest-release']);
     versions.push(['Latest Snapshot', 'latest-snapshot']);
     if (fs.existsSync('jars/manifest.json')) {
-      var customVersions = require('jars/manifest');
+      var customVersions = require('./jars/manifest');
       for (x in customVersions) {
         if (fs.existsSync('jars/' + customVersions[x])) {
           versions.push([x, 'custom?' + customVersions[x]]);
@@ -599,11 +600,11 @@ if (process.argv.indexOf('--headless') === -1) {
   app.listen(80, () => console.log('data/server UI listening on port 80!'));
 }
 if (process.platform === 'win32') {
-  var readline = require('readline').createInterface({
+  var readlineInterface = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  readline.on('SIGINT', () => {
+  readlineInterface.on('SIGINT', () => {
     process.emit('SIGINT');
   });
 }
